@@ -24,6 +24,7 @@ button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radi
 .active{display:block}
 #panel{display:none}
 #loginBox{max-width:400px;margin:120px auto;}
+#adminPanelBtn{display:none;background:#10b981;}
 </style>
 </head>
 
@@ -41,11 +42,13 @@ button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radi
 <nav>
   <button class="active" onclick="show('list')">📋 Liste</button>
   <button onclick="show('new')">➕ Ekle</button>
+  <button id="adminPanelBtn" onclick="show('admin')">👑 Admin</button>
   <button onclick="logout()" style="background:red">Çıkış</button>
 </nav>
 
 <div class="container">
 
+<!-- LIST -->
 <div id="list" class="section active">
   <input id="search" placeholder="Ara" oninput="render()">
 
@@ -59,12 +62,27 @@ button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radi
   </table>
 </div>
 
+<!-- ADD -->
 <div id="new" class="section">
   <input id="no" placeholder="No">
   <input id="date" type="date">
   <input id="dept" placeholder="Dept">
   <input id="desc" placeholder="Açıklama">
   <button class="action" onclick="add()">Kaydet</button>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="section">
+  <h3>Kullanıcı Rol Değiştir</h3>
+
+  <input id="userEmail" placeholder="Kullanıcı Email">
+  <select id="userRole">
+    <option value="viewer">viewer</option>
+    <option value="standard">standard</option>
+    <option value="admin">admin</option>
+  </select>
+
+  <button class="action" onclick="setRole()">Rol Güncelle</button>
 </div>
 
 </div>
@@ -84,7 +102,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
-// 🔥 FIREBASE CONFIG (DÜZELTİLDİ)
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAuSzUO0Ru9DP_ffGJLE7eNGjFJn3KLQ68",
   authDomain: "talep-notlari.firebaseapp.com",
@@ -98,9 +116,6 @@ const auth = getAuth(app);
 let currentUser=null;
 let currentRole="viewer";
 
-const loginBox=document.getElementById("loginBox");
-const panel=document.getElementById("panel");
-
 /* ROLE */
 async function loadRole(user){
   const ref = doc(db,"users",user.uid);
@@ -112,6 +127,8 @@ async function loadRole(user){
   }else{
     currentRole=snap.data().role;
   }
+
+  updateUI();
 }
 
 /* AUTH */
@@ -133,9 +150,7 @@ onAuthStateChanged(auth, async (user)=>{
 /* LOGIN */
 function login(){
   signInWithEmailAndPassword(auth,luser.value,lpass.value)
-  .catch(e=>{
-    alert(e.message);
-  });
+  .catch(e=>alert(e.message));
 }
 
 /* LOGOUT */
@@ -143,7 +158,7 @@ function logout(){
   signOut(auth);
 }
 
-/* PERMISSION */
+/* PERMISSIONS */
 const canAdd=()=>currentRole!=="viewer";
 const canEdit=()=>currentRole==="admin"||currentRole==="standard";
 const canDelete=()=>currentRole==="admin";
@@ -178,6 +193,30 @@ async function edit(id){
   if(!v) return;
   await updateDoc(doc(db,"records",id),{desc:v});
   render();
+}
+
+/* ADMIN ROLE CHANGE */
+async function setRole(){
+
+  const email = userEmail.value;
+  const role = userRole.value;
+
+  const snap = await getDocs(collection(db,"users"));
+
+  snap.forEach(async d=>{
+    if(d.data().email === email){
+      await updateDoc(doc(db,"users",d.id),{role});
+      alert("Rol güncellendi");
+      loadRole(currentUser);
+    }
+  });
+
+}
+
+/* UPDATE UI */
+function updateUI(){
+  document.getElementById("adminPanelBtn").style.display =
+    currentRole==="admin" ? "block" : "none";
 }
 
 /* RENDER */
@@ -226,6 +265,7 @@ window.render=render;
 window.show=show;
 window.del=del;
 window.edit=edit;
+window.setRole=setRole;
 
 </script>
 
