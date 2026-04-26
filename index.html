@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>ERP PANEL PRO FIXED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:system-ui;background:#eef2f7;}
+nav{display:flex;gap:10px;padding:12px;background:#111827;position:sticky;top:0;}
+nav button{flex:1;padding:12px;border:none;border-radius:10px;background:#1f2937;color:#fff;}
+nav button.active{background:#2563eb;}
+.container{max-width:1100px;margin:auto;padding:15px;}
+.card{background:#fff;padding:15px;border-radius:14px;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;background:#fff;}
+th{background:#f3f4f6;padding:10px;text-align:left;}
+td{padding:10px;border-bottom:1px solid #eee;}
+input{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #ddd;}
+button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radius:10px;margin-top:10px;}
+.btn{padding:5px 8px;border:none;border-radius:6px;cursor:pointer;}
+.edit{background:#f59e0b;color:#fff;}
+.del{background:#ef4444;color:#fff;}
+.section{display:none}
+.active{display:block}
+#panel{display:none}
+#loginBox{max-width:400px;margin:120px auto;}
+</style>
+</head>
+
+<body>
+
+<div id="loginBox" class="card">
+  <h3>Giriş</h3>
+  <input id="luser" placeholder="Email">
+  <input id="lpass" type="password" placeholder="Şifre">
+  <button class="action" onclick="login()">Giriş</button>
+</div>
+
+<div id="panel">
+
+<nav>
+  <button class="active" onclick="show('list')">📋 Liste</button>
+  <button onclick="show('new')">➕ Ekle</button>
+  <button onclick="logout()" style="background:red">Çıkış</button>
+</nav>
+
+<div class="container">
+
+<div id="list" class="section active">
+  <input id="search" placeholder="Ara" oninput="render()">
+
+  <table>
+    <thead>
+      <tr>
+        <th>No</th><th>Tarih</th><th>Dept</th><th>Açıklama</th><th>Kullanıcı</th><th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody id="tb"></tbody>
+  </table>
+</div>
+
+<div id="new" class="section">
+  <input id="no" placeholder="No">
+  <input id="date" type="date">
+  <input id="dept" placeholder="Dept">
+  <input id="desc" placeholder="Açıklama">
+  <button class="action" onclick="add()">Kaydet</button>
+</div>
+
+</div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  deleteDoc, doc, updateDoc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import {
+  getAuth, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey:"FIREBASE_API_KEY",
+  authDomain:"FIREBASE_AUTH_DOMAIN",
+  projectId:"FIREBASE_PROJECT_ID"
+});
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser=null;
+let currentRole="viewer";
+
+const loginBox=document.getElementById("loginBox");
+const panel=document.getElementById("panel");
+
+/* ROLE */
+async function loadRole(user){
+  const ref = doc(db,"users",user.uid);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()){
+    await setDoc(ref,{email:user.email,role:"viewer"});
+    currentRole="viewer";
+  }else{
+    currentRole=snap.data().role;
+  }
+}
+
+/* AUTH */
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    currentUser=user;
+    await loadRole(user);
+
+    loginBox.style.display="none";
+    panel.style.display="block";
+
+    render();
+  }else{
+    loginBox.style.display="block";
+    panel.style.display="none";
+  }
+});
+
+/* LOGIN */
+function login(){
+  signInWithEmailAndPassword(auth,luser.value,lpass.value)
+  .catch(e=>{
+    console.log(e);
+    alert(e.message);
+  });
+}
+
+/* LOGOUT */
+function logout(){
+  signOut(auth);
+}
+
+/* PERMISSION */
+const canAdd=()=>currentRole!=="viewer";
+const canEdit=()=>currentRole==="admin"||currentRole==="standard";
+const canDelete=()=>currentRole==="admin";
+
+/* ADD */
+async function add(){
+
+  if(!canAdd()) return alert("Yetkin yok");
+
+  await addDoc(collection(db,"records"),{
+    no:document.getElementById("no").value,
+    date:document.getElementById("date").value,
+    dept:document.getElementById("dept").value,
+    desc:document.getElementById("desc").value,
+    user:currentUser.email
+  });
+
+  render();
+}
+
+/* DELETE */
+async function del(id){
+  if(!canDelete()) return alert("Yetkin yok");
+  await deleteDoc(doc(db,"records",id));
+  render();
+}
+
+/* EDIT */
+async function edit(id){
+  if(!canEdit()) return alert("Yetkin yok");
+  const v=prompt("Yeni açıklama");
+  if(!v) return;
+  await updateDoc(doc(db,"records",id),{desc:v});
+  render();
+}
+
+/* RENDER */
+async function render(){
+
+  const tb=document.getElementById("tb");
+  const q=document.getElementById("search").value.toLowerCase();
+
+  tb.innerHTML="";
+
+  const snap=await getDocs(collection(db,"records"));
+
+  let arr=[];
+  snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+
+  arr
+  .filter(x=>(x.no+x.dept+x.desc).toLowerCase().includes(q))
+  .forEach(x=>{
+    tb.innerHTML+=`
+      <tr>
+        <td>${x.no}</td>
+        <td>${x.date}</td>
+        <td>${x.dept}</td>
+        <td>${x.desc}</td>
+        <td>${x.user}</td>
+        <td>
+          ${canEdit()?`<button class="btn edit" onclick="edit('${x.id}')">✏️</button>`:""}
+          ${canDelete()?`<button class="btn del" onclick="del('${x.id}')">🗑️</button>`:""}
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* NAV */
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* EXPORT */
+window.login=login;
+window.logout=logout;
+window.add=add;
+window.render=render;
+window.show=show;
+window.del=del;
+window.edit=edit;
+
+</script>
+
+</body>
+</html>
