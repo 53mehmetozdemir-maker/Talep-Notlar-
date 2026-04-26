@@ -31,20 +31,33 @@
 
 <!-- LIST -->
 <div id="list" class="section active">
+
   <div class="card">
+    <h3>Kayıtlar</h3>
+
+    <!-- 🔍 SEARCH (UPGRADE 2) -->
+    <input 
+      placeholder="🔍 Ara (no, dept, açıklama)"
+      oninput="setSearch(this.value)"
+      style="margin-bottom:10px">
+
     <table>
       <tbody id="tb"></tbody>
     </table>
   </div>
+
 </div>
 
 <!-- ADD -->
 <div id="new" class="section">
   <div class="card">
+    <h3>Yeni Kayıt</h3>
+
     <input id="no" placeholder="No">
     <input id="date" type="date">
     <input id="dept" placeholder="Dept">
     <input id="desc" placeholder="Açıklama">
+
     <button onclick="add()">Kaydet</button>
   </div>
 </div>
@@ -52,30 +65,47 @@
 <!-- ADMIN -->
 <div id="admin" class="section">
   <div class="card">
+    <h3>Kullanıcılar</h3>
     <div id="userList"></div>
   </div>
 </div>
 
-<!-- STATS -->
+<!-- STATS + ACTIVITY -->
 <div class="card">
-  <p>📊 Kayıt: <span id="totalRecords">0</span></p>
+
+  <h3>📊 Stats</h3>
+  <p>📄 Kayıt: <span id="totalRecords">0</span></p>
   <p>👥 Kullanıcı: <span id="totalUsers">0</span></p>
+
+  <hr style="border:1px solid #1f2937;margin:10px 0">
+
+  <h3>🕒 Activity</h3>
+  <div id="activity"></div>
+
 </div>
 
 </div>
 </div>
 
+<!-- MODULES -->
 <script type="module" src="./auth.js"></script>
 <script type="module" src="./records.js"></script>
 <script type="module" src="./dashboard.js"></script>
 <script type="module" src="./admin.js"></script>
 
+<!-- NAV FIX -->
 <script>
 window.show = function(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 
   if(id==="admin" && window.loadUsers) loadUsers();
+}
+
+/* SEARCH STATE */
+window.setSearch = function(v){
+  window.searchValue = v;
+  render();
 }
 </script>
 

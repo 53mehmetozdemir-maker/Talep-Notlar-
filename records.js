@@ -1,29 +1,8 @@
-import { db, auth } from "./firebase.js";
-import {
-  collection, addDoc, getDocs, deleteDoc, doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-window.add = async function(){
-
-  await addDoc(collection(db,"records"),{
-    no:no.value,
-    date:date.value,
-    dept:dept.value,
-    desc:desc.value,
-    user:auth.currentUser.email
-  });
-
-  render();
-}
-
-window.del = async function(id){
-  await deleteDoc(doc(db,"records",id));
-  render();
-}
-
 window.render = async function(){
 
   const tb = document.getElementById("tb");
+  const q = (window.searchValue || "").toLowerCase();
+
   tb.innerHTML="";
 
   const snap = await getDocs(collection(db,"records"));
@@ -31,15 +10,25 @@ window.render = async function(){
   snap.forEach(d=>{
     const x = d.data();
 
-    tb.innerHTML += `
-      <tr>
-        <td>${x.no}</td>
-        <td>${x.date}</td>
-        <td>${x.dept}</td>
-        <td>${x.desc}</td>
-        <td>${x.user}</td>
-        <td><button onclick="del('${d.id}')">Sil</button></td>
-      </tr>
-    `;
+    const text = (x.no + x.dept + x.desc).toLowerCase();
+
+    if(text.includes(q)){
+
+      tb.innerHTML += `
+        <tr>
+          <td>${x.no}</td>
+          <td>${x.date}</td>
+          <td>${x.dept}</td>
+          <td>${x.desc}</td>
+          <td>${x.user}</td>
+          <td><button onclick="del('${d.id}')">Sil</button></td>
+        </tr>
+      `;
+    }
   });
+}
+
+window.setSearch = function(v){
+  window.searchValue = v;
+  render();
 }
