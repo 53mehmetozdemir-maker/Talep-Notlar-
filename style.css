@@ -1,9 +1,11 @@
 body{
   margin:0;
   font-family:system-ui;
-  background:#f1f5f9;
+  background:#0b1220;
+  color:#e5e7eb;
 }
 
+/* NAV */
 nav{
   display:flex;
   gap:10px;
@@ -11,6 +13,7 @@ nav{
   background:#0f172a;
   position:sticky;
   top:0;
+  border-bottom:1px solid #1f2937;
 }
 
 nav button{
@@ -19,67 +22,85 @@ nav button{
   border:none;
   border-radius:10px;
   background:#1e293b;
-  color:white;
+  color:#e5e7eb;
   cursor:pointer;
+  transition:.2s;
 }
 
 nav button:hover{
   background:#334155;
 }
 
-.section{display:none}
-.active{display:block}
-
+/* LOGIN */
 #loginBox{
-  max-width:360px;
+  max-width:380px;
   margin:120px auto;
-  background:white;
+  background:#111827;
   padding:20px;
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
+/* INPUTS */
 input{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-top:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
+  border-radius:10px;
+  border:1px solid #374151;
+  background:#0b1220;
+  color:white;
 }
 
+/* BUTTON */
 button{
   margin-top:10px;
-  padding:10px;
+  padding:12px;
   width:100%;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background:#2563eb;
   color:white;
   cursor:pointer;
 }
 
+/* SECTIONS */
+.section{display:none}
+.active{display:block}
+
+/* CARD */
+.card{
+  background:#111827;
+  padding:16px;
+  border-radius:14px;
+  margin:12px 0;
+  border:1px solid #1f2937;
+}
+
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
-  background:white;
-  border-radius:10px;
+  background:#111827;
+  border-radius:12px;
   overflow:hidden;
 }
 
-td,th{
-  padding:12px;
-  border-bottom:1px solid #eee;
-}
-
 th{
-  background:#f8fafc;
+  background:#0f172a;
   text-align:left;
+  padding:12px;
+  font-size:13px;
+  color:#9ca3af;
 }
 
-.card{
-  background:white;
-  padding:15px;
-  border-radius:12px;
-  margin:10px 0;
-  box-shadow:0 5px 15px rgba(0,0,0,0.05);
+td{
+  padding:12px;
+  border-bottom:1px solid #1f2937;
+  font-size:14px;
+}
+
+/* HOVER ROW */
+tr:hover td{
+  background:#0f172a;
 }

@@ -4,54 +4,94 @@
 <meta charset="UTF-8">
 <title>ERP PRO</title>
 <link rel="stylesheet" href="./style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
 
+<!-- LOGIN -->
 <div id="loginBox" class="card">
+  <h2>Giriş</h2>
   <input id="luser" placeholder="Email">
   <input id="lpass" type="password" placeholder="Şifre">
-  <button onclick="login()">Giriş</button>
+  <button onclick="login()">Giriş Yap</button>
 </div>
 
-<div id="panel">
+<!-- PANEL -->
+<div id="panel" style="display:none">
 
 <nav>
-  <button onclick="show('list')">Liste</button>
-  <button onclick="show('new')">Ekle</button>
-  <button onclick="show('admin')">Admin</button>
-  <button onclick="logout()">Çıkış</button>
+  <button onclick="show('list')">📋 Liste</button>
+  <button onclick="show('new')">➕ Ekle</button>
+  <button onclick="show('admin')">👑 Admin</button>
+  <button onclick="logout()" style="background:#ef4444">Çıkış</button>
 </nav>
 
+<div style="padding:15px">
+
+<!-- LIST -->
 <div id="list" class="section active">
-  <table>
-    <tbody id="tb"></tbody>
-  </table>
+  <div class="card">
+    <h3>Kayıtlar</h3>
+    <table>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
 </div>
 
+<!-- ADD -->
 <div id="new" class="section">
-  <input id="no">
-  <input id="date">
-  <input id="dept">
-  <input id="desc">
-  <button onclick="add()">Kaydet</button>
+  <div class="card">
+    <h3>Yeni Kayıt</h3>
+
+    <input id="no" placeholder="No">
+    <input id="date" type="date">
+    <input id="dept" placeholder="Dept">
+    <input id="desc" placeholder="Açıklama">
+
+    <button onclick="add()">Kaydet</button>
+  </div>
 </div>
 
+<!-- ADMIN -->
 <div id="admin" class="section">
-  <div id="userList"></div>
+  <div class="card">
+    <h3>Kullanıcılar</h3>
+    <div id="userList"></div>
+  </div>
 </div>
 
-<div>
-  <h3>Stats</h3>
-  <p id="totalRecords"></p>
-  <p id="totalUsers"></p>
+<!-- STATS -->
+<div class="card">
+  <h3>📊 Stats</h3>
+  <p>Toplam Kayıt: <span id="totalRecords">0</span></p>
+  <p>Toplam Kullanıcı: <span id="totalUsers">0</span></p>
 </div>
 
 </div>
+</div>
 
+<!-- JS MODULES -->
 <script type="module" src="./auth.js"></script>
 <script type="module" src="./records.js"></script>
 <script type="module" src="./dashboard.js"></script>
 <script type="module" src="./admin.js"></script>
+
+<script>
+/* NAV */
+window.show = function(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  if(id==="admin" && window.loadUsers) loadUsers();
+}
+
+/* PANEL CONTROL (LOGIN FIX) */
+window.showPanel = function(){
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("panel").style.display="block";
+}
+</script>
 
 </body>
 </html>
