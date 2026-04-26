@@ -1,13 +1,11 @@
 import { db } from "./firebase.js";
+import { state } from "./state.js";
 import {
   collection, addDoc, getDocs,
   deleteDoc, doc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-window.searchText = "";
-window.startDate = "";
-window.endDate = "";
-
+/* ADD */
 window.add = async () => {
 
   if (!no.value || !date.value || !dept.value || !desc.value) {
@@ -23,7 +21,7 @@ window.add = async () => {
   });
 
   if (exists) {
-    alert("Bu talep numarası zaten var");
+    alert("Talep no zaten var");
     return;
   }
 
@@ -32,27 +30,30 @@ window.add = async () => {
     date: date.value,
     dept: dept.value,
     desc: desc.value,
-    user: auth.currentUser.email
+    user: state.user.email
   });
 
-  render();
+  renderRecords();
   loadDashboard?.();
 };
 
+/* DELETE */
 window.del = async (id) => {
   await deleteDoc(doc(db, "records", id));
-  render();
+  renderRecords();
   loadDashboard?.();
 };
 
+/* EDIT */
 window.edit = async (id) => {
   const v = prompt("Yeni açıklama");
   if (!v) return;
   await updateDoc(doc(db, "records", id), { desc: v });
-  render();
+  renderRecords();
 };
 
-window.render = async () => {
+/* RENDER ENGINE */
+export async function renderRecords() {
 
   const tb = document.getElementById("tb");
   tb.innerHTML = "";
@@ -60,19 +61,22 @@ window.render = async () => {
   const snap = await getDocs(collection(db, "records"));
 
   let arr = [];
+
   snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
 
   arr = arr.filter(x => {
 
-    const s = (x.no + x.dept + x.desc)
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
+    const searchMatch =
+      (x.no + x.dept + x.desc)
+        .toLowerCase()
+        .includes(state.search.toLowerCase());
 
-    const d = (!startDate || !endDate)
-      ? true
-      : (x.date >= startDate && x.date <= endDate);
+    const dateMatch =
+      (!state.startDate || !state.endDate)
+        ? true
+        : (x.date >= state.startDate && x.date <= state.endDate);
 
-    return s && d;
+    return searchMatch && dateMatch;
   });
 
   arr.forEach(x => {
@@ -92,4 +96,4 @@ window.render = async () => {
   });
 
   document.getElementById("totalRecords").innerText = arr.length;
-};
+}

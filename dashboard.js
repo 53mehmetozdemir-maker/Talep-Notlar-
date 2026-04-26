@@ -1,7 +1,7 @@
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-window.loadDashboard = async () => {
+export async function loadDashboard() {
 
   const r = await getDocs(collection(db, "records"));
   const u = await getDocs(collection(db, "users"));
@@ -16,4 +16,4 @@ window.loadDashboard = async () => {
   });
 
   activity.innerHTML = html;
-};
+}
