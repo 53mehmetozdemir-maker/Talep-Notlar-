@@ -7,15 +7,14 @@ window.loadUsers = async function(){
 
   const snap = await getDocs(collection(db,"users"));
 
-  let html = "";
+  let html="";
 
   snap.forEach(u=>{
     const d=u.data();
 
     html += `
-      <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #ddd">
-        <span>${d.email}</span>
-
+      <div class="card">
+        <b>${d.email}</b>
         <select onchange="changeRole('${u.id}',this.value)">
           <option ${d.role==="viewer"?"selected":""}>viewer</option>
           <option ${d.role==="standard"?"selected":""}>standard</option>

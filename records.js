@@ -1,20 +1,16 @@
 import { db, auth } from "./firebase.js";
 import {
-  collection, addDoc, getDocs,
-  deleteDoc, doc
+  collection, addDoc, getDocs, deleteDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 window.add = async function(){
-
-  const user = auth.currentUser;
-  if(!user) return alert("Login ol");
 
   await addDoc(collection(db,"records"),{
     no:no.value,
     date:date.value,
     dept:dept.value,
     desc:desc.value,
-    user:user.email
+    user:auth.currentUser.email
   });
 
   render();
@@ -42,7 +38,7 @@ window.render = async function(){
         <td>${x.dept}</td>
         <td>${x.desc}</td>
         <td>${x.user}</td>
-        <td><button onclick="del('${d.id}')">🗑</button></td>
+        <td><button onclick="del('${d.id}')">Sil</button></td>
       </tr>
     `;
   });

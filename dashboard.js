@@ -3,9 +3,9 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/f
 
 window.loadDashboard = async function(){
 
-  const rec = await getDocs(collection(db,"records"));
-  document.getElementById("totalRecords").innerText = rec.size;
+  const r = await getDocs(collection(db,"records"));
+  document.getElementById("totalRecords").innerText = r.size;
 
-  const users = await getDocs(collection(db,"users"));
-  document.getElementById("totalUsers").innerText = users.size;
+  const u = await getDocs(collection(db,"users"));
+  document.getElementById("totalUsers").innerText = u.size;
 }
