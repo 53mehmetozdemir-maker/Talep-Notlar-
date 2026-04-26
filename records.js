@@ -1,4 +1,4 @@
-import { db, auth } from "./firebase.js";
+import { db } from "./firebase.js";
 import {
   collection, addDoc, getDocs,
   deleteDoc, doc, updateDoc
@@ -8,33 +8,22 @@ window.searchText = "";
 window.startDate = "";
 window.endDate = "";
 
-/* UNIQUE CHECK + VALIDATION */
-window.add = async function () {
+window.add = async () => {
 
-  const fields = [no, date, dept, desc];
-  let error = false;
+  if (!no.value || !date.value || !dept.value || !desc.value) {
+    alert("Boş alan var");
+    return;
+  }
 
-  fields.forEach(f => {
-    if (!f.value) {
-      f.style.border = "2px solid red";
-      error = true;
-    } else {
-      f.style.border = "";
-    }
-  });
-
-  if (error) return;
-
-  /* UNIQUE TALep NO */
   const snap = await getDocs(collection(db, "records"));
-  let exists = false;
 
+  let exists = false;
   snap.forEach(d => {
     if (d.data().no === no.value) exists = true;
   });
 
   if (exists) {
-    alert("Bu talep numarası zaten var!");
+    alert("Bu talep numarası zaten var");
     return;
   }
 
@@ -50,50 +39,43 @@ window.add = async function () {
   loadDashboard?.();
 };
 
-/* DELETE */
-window.del = async function (id) {
+window.del = async (id) => {
   await deleteDoc(doc(db, "records", id));
   render();
   loadDashboard?.();
 };
 
-/* EDIT */
-window.edit = async function (id) {
-  const val = prompt("Yeni açıklama");
-  if (!val) return;
-
-  await updateDoc(doc(db, "records", id), { desc: val });
+window.edit = async (id) => {
+  const v = prompt("Yeni açıklama");
+  if (!v) return;
+  await updateDoc(doc(db, "records", id), { desc: v });
   render();
 };
 
-/* RENDER */
-window.render = async function () {
+window.render = async () => {
 
   const tb = document.getElementById("tb");
   tb.innerHTML = "";
 
   const snap = await getDocs(collection(db, "records"));
 
-  let data = [];
+  let arr = [];
+  snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
 
-  snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+  arr = arr.filter(x => {
 
-  data = data.filter(x => {
+    const s = (x.no + x.dept + x.desc)
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
 
-    const matchSearch =
-      (x.no + x.dept + x.desc)
-        .toLowerCase()
-        .includes(window.searchText.toLowerCase());
+    const d = (!startDate || !endDate)
+      ? true
+      : (x.date >= startDate && x.date <= endDate);
 
-    const matchDate =
-      (!startDate || !endDate)
-        ? true
-        : (x.date >= startDate && x.date <= endDate);
-
-    return matchSearch && matchDate;
+    return s && d;
   });
 
-  data.forEach(x => {
+  arr.forEach(x => {
     tb.innerHTML += `
       <tr>
         <td>${x.no}</td>
@@ -102,12 +84,12 @@ window.render = async function () {
         <td>${x.desc}</td>
         <td>${x.user}</td>
         <td>
-          <button onclick="edit('${x.id}')">Düzenle</button>
-          <button onclick="del('${x.id}')">Sil</button>
+          <button onclick="edit('${x.id}')">Edit</button>
+          <button onclick="del('${x.id}')">Del</button>
         </td>
       </tr>
     `;
   });
 
-  document.getElementById("totalRecords").innerText = data.length;
+  document.getElementById("totalRecords").innerText = arr.length;
 };

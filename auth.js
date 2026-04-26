@@ -5,24 +5,17 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import {
-  doc, getDoc, setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-window.login = async function () {
-  const email = luser.value;
-  const pass = lpass.value;
-
-  await signInWithEmailAndPassword(auth, email, pass);
-};
-
-window.logout = async function () {
-  await signOut(auth);
-};
-
+export let currentUser = null;
 export let role = "viewer";
 
-/* ROLE SYSTEM */
+window.login = async () => {
+  await signInWithEmailAndPassword(auth, luser.value, lpass.value);
+};
+
+window.logout = () => signOut(auth);
+
 async function loadRole(user) {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -37,6 +30,7 @@ async function loadRole(user) {
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    currentUser = user;
     await loadRole(user);
 
     loginBox.style.display = "none";

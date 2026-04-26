@@ -3,9 +3,9 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID"
+  apiKey: "AIzaSyAuSzUO0Ru9DP_ffGJLE7eNGjFJn3KLQ68",
+  authDomain: "talep-notlari.firebaseapp.com",
+  projectId: "talep-notlari"
 };
 
 const app = initializeApp(firebaseConfig);

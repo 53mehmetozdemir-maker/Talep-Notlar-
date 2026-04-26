@@ -1,35 +1,44 @@
 import { db } from "./firebase.js";
 import {
-  collection, getDocs, updateDoc, doc
+  collection, getDocs, updateDoc, doc, addDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* USERS */
-window.loadUsers = async function () {
-
+window.loadUsers = async () => {
   const snap = await getDocs(collection(db, "users"));
-
-  let html = "";
+  users.innerHTML = "";
 
   snap.forEach(d => {
     const u = d.data();
 
-    html += `
+    users.innerHTML += `
       <div class="card">
-        <b>${u.email}</b>
-
-        <select onchange="changeRole('${d.id}',this.value)">
-          <option ${u.role === "viewer" ? "selected" : ""}>viewer</option>
-          <option ${u.role === "standard" ? "selected" : ""}>standard</option>
-          <option ${u.role === "admin" ? "selected" : ""}>admin</option>
+        ${u.email}
+        <select onchange="setRole('${d.id}',this.value)">
+          <option ${u.role==="viewer"?"selected":""}>viewer</option>
+          <option ${u.role==="standard"?"selected":""}>standard</option>
+          <option ${u.role==="admin"?"selected":""}>admin</option>
         </select>
       </div>
     `;
   });
-
-  document.getElementById("userList").innerHTML = html;
 };
 
-window.changeRole = async function (id, role) {
+window.setRole = async (id, role) => {
   await updateDoc(doc(db, "users", id), { role });
-  loadUsers();
+};
+
+window.addDept = async () => {
+  await addDoc(collection(db, "depts"), { name: newDept.value });
+  loadDept();
+};
+
+window.loadDept = async () => {
+  const snap = await getDocs(collection(db, "depts"));
+  dept.innerHTML = "";
+
+  snap.forEach(d => {
+    const o = document.createElement("option");
+    o.text = d.data().name;
+    dept.appendChild(o);
+  });
 };
