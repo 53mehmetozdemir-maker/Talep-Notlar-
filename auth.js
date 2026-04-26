@@ -6,7 +6,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { state } from "./state.js";
+
+export let currentUser = null;
+export let role = "viewer";
 
 window.login = async () => {
   await signInWithEmailAndPassword(auth, luser.value, lpass.value);
@@ -20,21 +22,24 @@ async function loadRole(user) {
 
   if (!snap.exists()) {
     await setDoc(ref, { email: user.email, role: "viewer" });
-    state.role = "viewer";
+    role = "viewer";
   } else {
-    state.role = snap.data().role;
+    role = snap.data().role;
   }
 }
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    state.user = user;
+    currentUser = user;
     await loadRole(user);
 
     loginBox.style.display = "none";
     panel.style.display = "block";
 
-    window.initApp?.();
+    window.render?.();
+    window.loadDashboard?.();
+    window.loadUsers?.();
+    window.loadDepts?.();
   } else {
     loginBox.style.display = "block";
     panel.style.display = "none";

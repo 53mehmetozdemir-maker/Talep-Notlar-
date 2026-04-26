@@ -3,10 +3,8 @@ import {
   collection, getDocs, updateDoc, doc, addDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* USERS */
-export async function loadUsers() {
+window.loadUsers = async () => {
   const snap = await getDocs(collection(db, "users"));
-
   users.innerHTML = "";
 
   snap.forEach(d => {
@@ -23,16 +21,19 @@ export async function loadUsers() {
       </div>
     `;
   });
-}
+};
 
 window.setRole = async (id, role) => {
   await updateDoc(doc(db, "users", id), { role });
 };
 
-/* DEPTS */
-export async function loadDepts() {
-  const snap = await getDocs(collection(db, "depts"));
+window.addDept = async () => {
+  await addDoc(collection(db, "depts"), { name: newDept.value });
+  loadDepts();
+};
 
+window.loadDepts = async () => {
+  const snap = await getDocs(collection(db, "depts"));
   dept.innerHTML = "";
 
   snap.forEach(d => {
@@ -40,9 +41,4 @@ export async function loadDepts() {
     o.text = d.data().name;
     dept.appendChild(o);
   });
-}
-
-window.addDept = async () => {
-  await addDoc(collection(db, "depts"), { name: newDept.value });
-  loadDepts();
 };

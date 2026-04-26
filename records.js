@@ -1,11 +1,14 @@
 import { db } from "./firebase.js";
-import { state } from "./state.js";
+import { currentUser } from "./auth.js";
 import {
   collection, addDoc, getDocs,
   deleteDoc, doc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ADD */
+window.searchText = "";
+window.startDate = "";
+window.endDate = "";
+
 window.add = async () => {
 
   if (!no.value || !date.value || !dept.value || !desc.value) {
@@ -21,7 +24,7 @@ window.add = async () => {
   });
 
   if (exists) {
-    alert("Talep no zaten var");
+    alert("Bu talep no zaten var");
     return;
   }
 
@@ -30,30 +33,25 @@ window.add = async () => {
     date: date.value,
     dept: dept.value,
     desc: desc.value,
-    user: state.user.email
+    user: currentUser.email
   });
 
-  renderRecords();
-  loadDashboard?.();
+  render();
 };
 
-/* DELETE */
 window.del = async (id) => {
   await deleteDoc(doc(db, "records", id));
-  renderRecords();
-  loadDashboard?.();
+  render();
 };
 
-/* EDIT */
 window.edit = async (id) => {
   const v = prompt("Yeni açıklama");
   if (!v) return;
   await updateDoc(doc(db, "records", id), { desc: v });
-  renderRecords();
+  render();
 };
 
-/* RENDER ENGINE */
-export async function renderRecords() {
+window.render = async () => {
 
   const tb = document.getElementById("tb");
   tb.innerHTML = "";
@@ -61,22 +59,18 @@ export async function renderRecords() {
   const snap = await getDocs(collection(db, "records"));
 
   let arr = [];
-
   snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
 
   arr = arr.filter(x => {
+    const s = (x.no + x.dept + x.desc)
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
 
-    const searchMatch =
-      (x.no + x.dept + x.desc)
-        .toLowerCase()
-        .includes(state.search.toLowerCase());
+    const d = (!startDate || !endDate)
+      ? true
+      : (x.date >= startDate && x.date <= endDate);
 
-    const dateMatch =
-      (!state.startDate || !state.endDate)
-        ? true
-        : (x.date >= state.startDate && x.date <= state.endDate);
-
-    return searchMatch && dateMatch;
+    return s && d;
   });
 
   arr.forEach(x => {
@@ -88,12 +82,12 @@ export async function renderRecords() {
         <td>${x.desc}</td>
         <td>${x.user}</td>
         <td>
-          <button onclick="edit('${x.id}')">Edit</button>
-          <button onclick="del('${x.id}')">Del</button>
+          <button onclick="edit('${x.id}')">Düzenle</button>
+          <button onclick="del('${x.id}')">Sil</button>
         </td>
       </tr>
     `;
   });
 
   document.getElementById("totalRecords").innerText = arr.length;
-}
+};
