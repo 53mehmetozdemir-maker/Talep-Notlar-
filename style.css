@@ -1,56 +1,41 @@
-.card:hover{
-  transform:translateY(-2px);
-  transition:.2s;
-  border-color:#3b82f6;
-}
-
-nav button:hover{
-  background:#3b82f6;
-}
-
-
 body{
   margin:0;
   font-family:system-ui;
   background:#0b1220;
-  color:#e5e7eb;
+  color:white;
 }
 
 nav{
   display:flex;
   gap:10px;
-  padding:12px;
+  padding:10px;
   background:#0f172a;
-  position:sticky;
-  top:0;
 }
 
 nav button{
   flex:1;
-  padding:12px;
+  padding:10px;
   border:none;
   border-radius:10px;
   background:#1e293b;
   color:white;
-  cursor:pointer;
 }
 
 .card{
   background:#111827;
-  padding:15px;
   margin:10px;
+  padding:15px;
   border-radius:12px;
-  border:1px solid #1f2937;
 }
 
-input{
+input,select{
   width:100%;
   padding:10px;
   margin-top:8px;
   border-radius:8px;
-  border:1px solid #374151;
   background:#0b1220;
   color:white;
+  border:1px solid #334155;
 }
 
 button{
@@ -61,7 +46,6 @@ button{
   border-radius:8px;
   background:#2563eb;
   color:white;
-  cursor:pointer;
 }
 
 table{
@@ -69,7 +53,7 @@ table{
   border-collapse:collapse;
 }
 
-td,th{
+td{
   padding:10px;
   border-bottom:1px solid #1f2937;
 }

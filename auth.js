@@ -1,29 +1,51 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-window.login = function(){
+import {
+  doc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+window.login = async function () {
   const email = luser.value;
   const pass = lpass.value;
 
-  signInWithEmailAndPassword(auth,email,pass)
-  .catch(e=>alert(e.message));
+  await signInWithEmailAndPassword(auth, email, pass);
+};
+
+window.logout = async function () {
+  await signOut(auth);
+};
+
+export let role = "viewer";
+
+/* ROLE SYSTEM */
+async function loadRole(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, { email: user.email, role: "viewer" });
+    role = "viewer";
+  } else {
+    role = snap.data().role;
+  }
 }
 
-window.logout = function(){
-  signOut(auth);
-}
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await loadRole(user);
 
-onAuthStateChanged(auth,(user)=>{
-  if(user){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("panel").style.display="block";
+    loginBox.style.display = "none";
+    panel.style.display = "block";
+
+    window.render?.();
     window.loadDashboard?.();
-  }else{
-    document.getElementById("loginBox").style.display="block";
-    document.getElementById("panel").style.display="none";
+  } else {
+    loginBox.style.display = "block";
+    panel.style.display = "none";
   }
 });
