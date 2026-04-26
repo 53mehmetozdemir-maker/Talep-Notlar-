@@ -1,34 +1,85 @@
-import { db } from "./firebase.js";
-import {
-  collection, getDocs, updateDoc, doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-window.loadUsers = async function(){
-
-  const snap = await getDocs(collection(db,"users"));
-
-  let html = "";
-
-  snap.forEach(u=>{
-    const d=u.data();
-
-    html += `
-      <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #ddd">
-        <span>${d.email}</span>
-
-        <select onchange="changeRole('${u.id}',this.value)">
-          <option ${d.role==="viewer"?"selected":""}>viewer</option>
-          <option ${d.role==="standard"?"selected":""}>standard</option>
-          <option ${d.role==="admin"?"selected":""}>admin</option>
-        </select>
-      </div>
-    `;
-  });
-
-  document.getElementById("userList").innerHTML = html;
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f1f5f9;
 }
 
-window.changeRole = async function(id,role){
-  await updateDoc(doc(db,"users",id),{role});
-  loadUsers();
+nav{
+  display:flex;
+  gap:10px;
+  padding:12px;
+  background:#0f172a;
+  position:sticky;
+  top:0;
+}
+
+nav button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#1e293b;
+  color:white;
+  cursor:pointer;
+}
+
+nav button:hover{
+  background:#334155;
+}
+
+.section{display:none}
+.active{display:block}
+
+#loginBox{
+  max-width:360px;
+  margin:120px auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+button{
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+td,th{
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+th{
+  background:#f8fafc;
+  text-align:left;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  margin:10px 0;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
 }
