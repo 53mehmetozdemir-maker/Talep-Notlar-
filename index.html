@@ -2,291 +2,56 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>ERP PANEL PRO FIXED</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{margin:0;font-family:system-ui;background:#eef2f7;}
-nav{display:flex;gap:10px;padding:12px;background:#111827;position:sticky;top:0;}
-nav button{flex:1;padding:12px;border:none;border-radius:10px;background:#1f2937;color:#fff;}
-nav button.active{background:#2563eb;}
-.container{max-width:1100px;margin:auto;padding:15px;}
-.card{background:#fff;padding:15px;border-radius:14px;margin-bottom:10px;}
-table{width:100%;border-collapse:collapse;background:#fff;}
-th{background:#f3f4f6;padding:10px;text-align:left;}
-td{padding:10px;border-bottom:1px solid #eee;}
-input{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #ddd;}
-button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radius:10px;margin-top:10px;}
-.btn{padding:5px 8px;border:none;border-radius:6px;cursor:pointer;}
-.edit{background:#f59e0b;color:#fff;}
-.del{background:#ef4444;color:#fff;}
-.section{display:none}
-.active{display:block}
-#panel{display:none}
-#loginBox{max-width:400px;margin:120px auto;}
-#adminPanelBtn{display:none;background:#10b981;}
-
-/* DASHBOARD UI */
-#userList .userCard{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px;
-  border-bottom:1px solid #eee;
-}
-
-select{
-  padding:6px;
-  border-radius:8px;
-}
-</style>
+<title>ERP PRO</title>
+<link rel="stylesheet" href="./style.css">
 </head>
-
 <body>
 
 <div id="loginBox" class="card">
-  <h3>Giriş</h3>
   <input id="luser" placeholder="Email">
   <input id="lpass" type="password" placeholder="Şifre">
-  <button class="action" onclick="login()">Giriş</button>
+  <button onclick="login()">Giriş</button>
 </div>
 
 <div id="panel">
 
 <nav>
-  <button class="active" onclick="show('list')">📋 Liste</button>
-  <button onclick="show('new')">➕ Ekle</button>
-  <button id="adminPanelBtn" onclick="show('admin')">👑 Admin</button>
-  <button onclick="logout()" style="background:red">Çıkış</button>
+  <button onclick="show('list')">Liste</button>
+  <button onclick="show('new')">Ekle</button>
+  <button onclick="show('admin')">Admin</button>
+  <button onclick="logout()">Çıkış</button>
 </nav>
 
-<div class="container">
-
-<!-- LIST -->
 <div id="list" class="section active">
-  <input id="search" placeholder="Ara" oninput="render()">
-
   <table>
-    <thead>
-      <tr>
-        <th>No</th><th>Tarih</th><th>Dept</th><th>Açıklama</th><th>Kullanıcı</th><th>İşlem</th>
-      </tr>
-    </thead>
     <tbody id="tb"></tbody>
   </table>
 </div>
 
-<!-- ADD -->
 <div id="new" class="section">
-  <input id="no" placeholder="No">
-  <input id="date" type="date">
-  <input id="dept" placeholder="Dept">
-  <input id="desc" placeholder="Açıklama">
-  <button class="action" onclick="add()">Kaydet</button>
+  <input id="no">
+  <input id="date">
+  <input id="dept">
+  <input id="desc">
+  <button onclick="add()">Kaydet</button>
 </div>
 
-<!-- ADMIN DASHBOARD -->
 <div id="admin" class="section">
+  <div id="userList"></div>
+</div>
 
-  <h2>👑 Admin Dashboard</h2>
-
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;">
-
-    <div class="card">
-      <h3 id="totalRecords">0</h3>
-      <p>Kayıt</p>
-    </div>
-
-    <div class="card">
-      <h3 id="totalUsers">0</h3>
-      <p>Kullanıcı</p>
-    </div>
-
-    <div class="card">
-      <h3 id="adminCount">0</h3>
-      <p>Admin</p>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <h3>👥 Kullanıcılar</h3>
-    <div id="userList"></div>
-  </div>
-
+<div>
+  <h3>Stats</h3>
+  <p id="totalRecords"></p>
+  <p id="totalUsers"></p>
 </div>
 
 </div>
-</div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs,
-  deleteDoc, doc, updateDoc, getDoc, setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import {
-  getAuth, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAuSzUO0Ru9DP_ffGJLE7eNGjFJn3KLQ68",
-  authDomain: "talep-notlari.firebaseapp.com",
-  projectId: "talep-notlari"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-let currentUser=null;
-let currentRole="viewer";
-
-/* ROLE */
-async function loadRole(user){
-  const ref = doc(db,"users",user.uid);
-  const snap = await getDoc(ref);
-
-  if(!snap.exists()){
-    await setDoc(ref,{email:user.email,role:"viewer"});
-    currentRole="viewer";
-  }else{
-    currentRole=snap.data().role;
-  }
-
-  updateUI();
-}
-
-/* AUTH */
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
-    currentUser=user;
-    await loadRole(user);
-
-    loginBox.style.display="none";
-    panel.style.display="block";
-
-    render();
-  }else{
-    loginBox.style.display="block";
-    panel.style.display="none";
-  }
-});
-
-/* LOGIN */
-function login(){
-  signInWithEmailAndPassword(auth,luser.value,lpass.value)
-  .catch(e=>alert(e.message));
-}
-
-/* LOGOUT */
-function logout(){
-  signOut(auth);
-}
-
-/* PERMISSIONS */
-const canAdd=()=>currentRole!=="viewer";
-const canEdit=()=>currentRole==="admin"||currentRole==="standard";
-const canDelete=()=>currentRole==="admin";
-
-/* ADD */
-async function add(){
-  if(!canAdd()) return alert("Yetkin yok");
-
-  await addDoc(collection(db,"records"),{
-    no:no.value,
-    date:date.value,
-    dept:dept.value,
-    desc:desc.value,
-    user:currentUser.email
-  });
-
-  render();
-}
-
-/* ADMIN ROLE CHANGE */
-async function setRole(){
-
-  const email = userEmail.value;
-  const role = userRole.value;
-
-  const snap = await getDocs(collection(db,"users"));
-
-  snap.forEach(async d=>{
-    if(d.data().email === email){
-      await updateDoc(doc(db,"users",d.id),{role});
-      loadDashboard();
-    }
-  });
-}
-
-/* DASHBOARD */
-async function loadDashboard(){
-
-  const rec = await getDocs(collection(db,"records"));
-  document.getElementById("totalRecords").innerText = rec.size;
-
-  const users = await getDocs(collection(db,"users"));
-  document.getElementById("totalUsers").innerText = users.size;
-
-  let adminCount=0;
-  let html="";
-
-  users.forEach(u=>{
-    const d=u.data();
-    if(d.role==="admin") adminCount++;
-
-    html+=`
-      <div class="userCard">
-        <div>
-          <b>${d.email}</b>
-        </div>
-
-        <select onchange="changeRole('${u.id}',this.value)">
-          <option ${d.role==="viewer"?"selected":""}>viewer</option>
-          <option ${d.role==="standard"?"selected":""}>standard</option>
-          <option ${d.role==="admin"?"selected":""}>admin</option>
-        </select>
-      </div>
-    `;
-  });
-
-  document.getElementById("adminCount").innerText = adminCount;
-  document.getElementById("userList").innerHTML = html;
-}
-
-/* ROLE UPDATE */
-async function changeRole(uid,role){
-  await updateDoc(doc(db,"users",uid),{role});
-  loadDashboard();
-}
-
-/* UI */
-function updateUI(){
-  document.getElementById("adminPanelBtn").style.display =
-    currentRole==="admin" ? "block" : "none";
-}
-
-/* NAV */
-function show(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-
-  if(id==="admin") loadDashboard();
-}
-
-/* EXPORT */
-window.login=login;
-window.logout=logout;
-window.add=add;
-window.show=show;
-window.setRole=setRole;
-window.changeRole=changeRole;
-
-</script>
+<script type="module" src="./auth.js"></script>
+<script type="module" src="./records.js"></script>
+<script type="module" src="./dashboard.js"></script>
+<script type="module" src="./admin.js"></script>
 
 </body>
 </html>
