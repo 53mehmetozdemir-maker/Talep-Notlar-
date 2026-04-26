@@ -25,6 +25,20 @@ button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radi
 #panel{display:none}
 #loginBox{max-width:400px;margin:120px auto;}
 #adminPanelBtn{display:none;background:#10b981;}
+
+/* DASHBOARD UI */
+#userList .userCard{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
+
+select{
+  padding:6px;
+  border-radius:8px;
+}
 </style>
 </head>
 
@@ -71,18 +85,35 @@ button.action{background:#2563eb;color:#fff;border:none;padding:10px;border-radi
   <button class="action" onclick="add()">Kaydet</button>
 </div>
 
-<!-- ADMIN -->
+<!-- ADMIN DASHBOARD -->
 <div id="admin" class="section">
-  <h3>Kullanıcı Rol Değiştir</h3>
 
-  <input id="userEmail" placeholder="Kullanıcı Email">
-  <select id="userRole">
-    <option value="viewer">viewer</option>
-    <option value="standard">standard</option>
-    <option value="admin">admin</option>
-  </select>
+  <h2>👑 Admin Dashboard</h2>
 
-  <button class="action" onclick="setRole()">Rol Güncelle</button>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;">
+
+    <div class="card">
+      <h3 id="totalRecords">0</h3>
+      <p>Kayıt</p>
+    </div>
+
+    <div class="card">
+      <h3 id="totalUsers">0</h3>
+      <p>Kullanıcı</p>
+    </div>
+
+    <div class="card">
+      <h3 id="adminCount">0</h3>
+      <p>Admin</p>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3>👥 Kullanıcılar</h3>
+    <div id="userList"></div>
+  </div>
+
 </div>
 
 </div>
@@ -101,8 +132,6 @@ import {
   signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-
-// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAuSzUO0Ru9DP_ffGJLE7eNGjFJn3KLQ68",
   authDomain: "talep-notlari.firebaseapp.com",
@@ -165,7 +194,6 @@ const canDelete=()=>currentRole==="admin";
 
 /* ADD */
 async function add(){
-
   if(!canAdd()) return alert("Yetkin yok");
 
   await addDoc(collection(db,"records"),{
@@ -176,22 +204,6 @@ async function add(){
     user:currentUser.email
   });
 
-  render();
-}
-
-/* DELETE */
-async function del(id){
-  if(!canDelete()) return alert("Yetkin yok");
-  await deleteDoc(doc(db,"records",id));
-  render();
-}
-
-/* EDIT */
-async function edit(id){
-  if(!canEdit()) return alert("Yetkin yok");
-  const v=prompt("Yeni açıklama");
-  if(!v) return;
-  await updateDoc(doc(db,"records",id),{desc:v});
   render();
 }
 
@@ -206,66 +218,73 @@ async function setRole(){
   snap.forEach(async d=>{
     if(d.data().email === email){
       await updateDoc(doc(db,"users",d.id),{role});
-      alert("Rol güncellendi");
-      loadRole(currentUser);
+      loadDashboard();
     }
   });
-
 }
 
-/* UPDATE UI */
+/* DASHBOARD */
+async function loadDashboard(){
+
+  const rec = await getDocs(collection(db,"records"));
+  document.getElementById("totalRecords").innerText = rec.size;
+
+  const users = await getDocs(collection(db,"users"));
+  document.getElementById("totalUsers").innerText = users.size;
+
+  let adminCount=0;
+  let html="";
+
+  users.forEach(u=>{
+    const d=u.data();
+    if(d.role==="admin") adminCount++;
+
+    html+=`
+      <div class="userCard">
+        <div>
+          <b>${d.email}</b>
+        </div>
+
+        <select onchange="changeRole('${u.id}',this.value)">
+          <option ${d.role==="viewer"?"selected":""}>viewer</option>
+          <option ${d.role==="standard"?"selected":""}>standard</option>
+          <option ${d.role==="admin"?"selected":""}>admin</option>
+        </select>
+      </div>
+    `;
+  });
+
+  document.getElementById("adminCount").innerText = adminCount;
+  document.getElementById("userList").innerHTML = html;
+}
+
+/* ROLE UPDATE */
+async function changeRole(uid,role){
+  await updateDoc(doc(db,"users",uid),{role});
+  loadDashboard();
+}
+
+/* UI */
 function updateUI(){
   document.getElementById("adminPanelBtn").style.display =
     currentRole==="admin" ? "block" : "none";
-}
-
-/* RENDER */
-async function render(){
-
-  const tb=document.getElementById("tb");
-  const q=document.getElementById("search").value.toLowerCase();
-
-  tb.innerHTML="";
-
-  const snap=await getDocs(collection(db,"records"));
-
-  let arr=[];
-  snap.forEach(d=>arr.push({id:d.id,...d.data()}));
-
-  arr
-  .filter(x=>(x.no+x.dept+x.desc).toLowerCase().includes(q))
-  .forEach(x=>{
-    tb.innerHTML+=`
-      <tr>
-        <td>${x.no}</td>
-        <td>${x.date}</td>
-        <td>${x.dept}</td>
-        <td>${x.desc}</td>
-        <td>${x.user}</td>
-        <td>
-          ${canEdit()?`<button class="btn edit" onclick="edit('${x.id}')">✏️</button>`:""}
-          ${canDelete()?`<button class="btn del" onclick="del('${x.id}')">🗑️</button>`:""}
-        </td>
-      </tr>
-    `;
-  });
 }
 
 /* NAV */
 function show(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
+
+  if(id==="admin") loadDashboard();
 }
 
 /* EXPORT */
 window.login=login;
 window.logout=logout;
 window.add=add;
-window.render=render;
 window.show=show;
-window.del=del;
-window.edit=edit;
 window.setRole=setRole;
+window.changeRole=changeRole;
 
 </script>
 
