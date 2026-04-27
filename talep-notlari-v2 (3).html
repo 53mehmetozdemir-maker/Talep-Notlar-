@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>Talep Notları</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23c8ff00'/%3E%3Cpolygon points='32,0 32,8 24,0' fill='%2304040a'/%3E%3Ctext x='5' y='23' font-family='monospace' font-weight='700' font-size='18' fill='%2304040a'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script>
+(function(){
+  const t = localStorage.getItem('talep-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+:root {
+  --ease: cubic-bezier(0.25, 0, 0, 1);
+  --fast: 160ms var(--ease);
+  --med:  300ms var(--ease);
+}
+[data-theme="dark"] {
+  --c0:#04040a;--c1:#0a0a14;--c2:#111120;--c3:#1a1a30;--c4:#252545;--c5:#3a3a6a;
+  --tx:#f0f0ff;--t2:#9898c8;--t3:#5a5a8a;
+  --hi:#c8ff00;--hi2:#ff3cac;--hi3:#3cefff;--hi4:#ffb800;
+  --hib:rgba(200,255,0,0.08);--hib2:rgba(255,60,172,0.08);
+  --bd:rgba(200,255,0,0.15);--bd2:rgba(255,255,255,0.06);
+  --ok:#00e5a0;--warn:#ffb800;--err:#ff4466;
+  --ok-bg:rgba(0,229,160,0.1);--warn-bg:rgba(255,184,0,0.1);--err-bg:rgba(255,68,102,0.1);
+  --ok-bd:rgba(0,229,160,0.3);--warn-bd:rgba(255,184,0,0.3);--err-bd:rgba(255,68,102,0.3);
+  --scrim:rgba(4,4,10,0.85);
+  --card-shine:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 60%);
+}
+[data-theme="light"] {
+  --c0:#f4f4ec;--c1:#ffffff;--c2:#f0f0e8;--c3:#e8e8dc;--c4:#d8d8cc;--c5:#b8b8aa;
+  --tx:#0a0a18;--t2:#4a4a6a;--t3:#8a8aaa;
+  --hi:#5200ff;--hi2:#e2006a;--hi3:#0086cc;--hi4:#cc7700;
+  --hib:rgba(82,0,255,0.07);--hib2:rgba(226,0,106,0.07);
+  --bd:rgba(82,0,255,0.25);--bd2:rgba(0,0,0,0.08);
+  --ok:#008a5e;--warn:#b86800;--err:#cc1133;
+  --ok-bg:rgba(0,138,94,0.08);--warn-bg:rgba(184,104,0,0.08);--err-bg:rgba(204,17,51,0.08);
+  --ok-bd:rgba(0,138,94,0.25);--warn-bd:rgba(184,104,0,0.25);--err-bd:rgba(204,17,51,0.25);
+  --scrim:rgba(10,10,24,0.6);
+  --card-shine:linear-gradient(135deg,rgba(255,255,255,0.7) 0%,transparent 60%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:'Space Grotesk',sans-serif;background:var(--c0);color:var(--tx);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background var(--med),color var(--med);}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);pointer-events:none;z-index:0;}
+[data-theme="dark"] body::before{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.012) 2px,rgba(255,255,255,0.012) 4px);}
+body>*:not(style):not(script){position:relative;z-index:1;}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-0.03em;}
+em{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1.05em;letter-spacing:-0.01em;color:var(--hi);}
+code{font-family:'Space Mono',monospace;font-size:0.88em;}
+
+/* NAV */
+nav{background:var(--c1);border-bottom:1px solid var(--bd2);padding:0 28px;height:58px;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:200;transition:background var(--med);}
+[data-theme="dark"] nav{background:rgba(10,10,20,0.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+.nav-brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-0.04em;color:var(--tx);margin-right:auto;display:flex;align-items:center;gap:10px;text-transform:uppercase;}
+.nav-logo{width:28px;height:28px;background:var(--hi);display:flex;align-items:center;justify-content:center;color:var(--c0);font-size:13px;font-weight:700;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;transition:transform var(--fast);}
+.nav-logo:hover{transform:rotate(3deg) scale(1.05);}
+nav button{padding:7px 15px;border:1px solid transparent;border-radius:0;background:transparent;color:var(--t2);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.02em;text-transform:uppercase;transition:var(--fast);position:relative;}
+nav button:hover{color:var(--tx);background:var(--hib);}
+nav button.active{color:var(--hi);background:var(--hib);border-color:var(--bd);}
+nav button.logout-btn{border:1px solid var(--bd2);color:var(--t3);margin-left:8px;}
+nav button.logout-btn:hover{background:var(--err-bg);color:var(--err);border-color:var(--err-bd);}
+.theme-btn{width:32px!important;height:32px!important;padding:0!important;border:1px solid var(--bd2)!important;display:flex!important;align-items:center!important;justify-content:center!important;background:var(--c2)!important;color:var(--t2)!important;cursor:pointer!important;border-radius:0!important;margin-left:6px!important;text-transform:none!important;letter-spacing:0!important;transition:var(--fast)!important;}
+.theme-btn:hover{background:var(--hib)!important;color:var(--hi)!important;border-color:var(--bd)!important;transform:rotate(15deg)!important;}
+.theme-btn svg{width:15px;height:15px;}
+[data-theme="dark"] .icon-sun{display:block;}[data-theme="dark"] .icon-moon{display:none;}
+[data-theme="light"] .icon-sun{display:none;}[data-theme="light"] .icon-moon{display:block;}
+
+/* LAYOUT */
+.wrap{max-width:1280px;margin:0 auto;padding:32px 28px;}
+.page-hdr{margin-bottom:28px;}
+.page-hdr h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1;font-weight:700;letter-spacing:-0.04em;}
+.page-hdr p{color:var(--t2);font-size:0.9rem;margin-top:6px;letter-spacing:0.01em;}
+
+/* PANEL */
+.panel{background:var(--c1);border:1px solid var(--bd2);position:relative;overflow:hidden;transition:background var(--med),border-color var(--med);}
+.panel::after{content:'';position:absolute;inset:0;background:var(--card-shine);pointer-events:none;}
+.panel-clip{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));}
+
+/* FILTER ROW */
+.filter-row{padding:20px 24px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:14px;align-items:flex-end;border-bottom:1px solid var(--bd2);}
+
+/* INPUTS */
+label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--t3);margin-bottom:6px;font-family:'Space Mono',monospace;}
+input,select,textarea{width:100%;padding:10px 13px;border:1px solid var(--bd2);background:var(--c2);color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;border-radius:0;transition:var(--fast);appearance:none;-webkit-appearance:none;}
+input::placeholder,textarea::placeholder{color:var(--t3);}
+input:hover,select:hover,textarea:hover{border-color:var(--c5);}
+input:focus,select:focus,textarea:focus{border-color:var(--hi);background:var(--hib);box-shadow:0 0 0 2px var(--bd);}
+textarea{resize:vertical;min-height:110px;font-family:inherit;}
+select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5a8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
+select option{background:var(--c2);color:var(--tx);}
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);cursor:pointer;}
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.4);cursor:pointer;}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;background:var(--hi);color:var(--c0);border:none;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;transition:var(--fast);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));width:100%;margin-top:24px;}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-2px);}
+.btn-primary:active{transform:translateY(0);}
+[data-theme="light"] .btn-primary{color:#04040a;}
+.btn-excel{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-bd);padding:0 18px;height:40px;display:flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:var(--fast);border-radius:0;}
+.btn-excel:hover{background:var(--ok);color:var(--c0);transform:translateY(-1px);}
+.btn-cancel{display:flex;align-items:center;justify-content:center;padding:11px;width:100%;background:transparent;border:1px solid var(--bd2);color:var(--t2);font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:13px;cursor:pointer;margin-top:8px;transition:var(--fast);border-radius:0;}
+.btn-cancel:hover{border-color:var(--c5);color:var(--tx);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{padding:12px 20px;text-align:left;background:var(--c2);border-bottom:1px solid var(--bd2);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.12em;font-family:'Space Mono',monospace;}
+td{padding:16px 20px;border-bottom:1px solid var(--bd2);font-size:13.5px;color:var(--tx);vertical-align:middle;}
+tbody tr{transition:background var(--fast);}
+tbody tr:hover td{background:var(--hib);}
+tbody tr:last-child td{border-bottom:none;}
+td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-spacing:0.05em;color:var(--hi);background:var(--hib);border:1px solid var(--bd);padding:3px 9px;display:inline-block;}
+.time-chip{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--hi3);background:rgba(60,239,255,0.08);border:1px solid rgba(60,239,255,0.2);padding:2px 7px;margin-left:6px;display:inline-block;}
+[data-theme="light"] .time-chip{color:#0086cc;background:rgba(0,134,204,0.07);border-color:rgba(0,134,204,0.2);}
+
+/* ACTION BUTTONS */
+.act{padding:5px 10px;border:1px solid transparent;background:transparent;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;transition:var(--fast);border-radius:0;}
+.act-edit{color:var(--warn);border-color:var(--warn-bd);background:var(--warn-bg);}
+.act-edit:hover{background:var(--warn);color:var(--c0);transform:translateY(-1px);}
+.act-del{color:var(--err);border-color:var(--err-bd);background:var(--err-bg);margin-left:4px;}
+.act-del:hover{background:var(--err);color:#fff;transform:translateY(-1px);}
+.act-view{color:var(--hi3);border-color:rgba(60,239,255,0.3);background:rgba(60,239,255,0.08);margin-left:4px;}
+.act-view:hover{background:var(--hi3);color:var(--c0);transform:translateY(-1px);}
+
+/* ROLE BADGE */
+.role-badge{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--hib);color:var(--hi);border:1px solid var(--bd);padding:3px 10px;display:inline-block;}
+
+/* SECTIONS */
+.section{display:none;}
+.section.active-section{display:block;animation:enter 0.35s var(--ease);}
+@keyframes enter{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* FORM */
+.form-wrap{max-width:660px;margin:0 auto;}
+.form-panel{padding:30px 32px;}
+.form-panel h3{font-size:2rem;letter-spacing:-0.04em;font-weight:700;margin-bottom:4px;}
+.form-sub{font-size:13px;color:var(--t2);margin-bottom:6px;display:block;letter-spacing:0.01em;}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0 8px;color:var(--t3);}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bd2);}
+.divider span{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.18em;font-weight:700;}
+
+/* FILE UPLOAD AREA */
+.upload-area{
+  border:2px dashed var(--bd2);
+  background:var(--c2);
+  padding:28px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:var(--fast);
+  position:relative;
+  margin-top:8px;
+}
+.upload-area:hover,.upload-area.dragover{border-color:var(--hi);background:var(--hib);}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:28px;margin-bottom:8px;display:block;}
+.upload-label{font-size:13px;color:var(--t2);}
+.upload-label span{color:var(--hi);font-weight:600;}
+.upload-hint{font-size:11px;color:var(--t3);margin-top:4px;font-family:'Space Mono',monospace;}
+
+.file-preview-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.file-preview-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;
+  background:var(--c2);
+  border:1px solid var(--bd2);
+  font-size:12px;
+}
+.file-preview-item .file-thumb{
+  width:36px;height:36px;object-fit:cover;border:1px solid var(--bd2);flex-shrink:0;
+}
+.file-preview-item .file-icon{width:36px;height:36px;background:var(--hib);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.file-preview-item .file-name{flex:1;color:var(--tx);font-family:'Space Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-preview-item .file-size{color:var(--t3);font-size:10px;font-family:'Space Mono',monospace;flex-shrink:0;}
+.file-remove{background:var(--err-bg);border:1px solid var(--err-bd);color:var(--err);padding:3px 7px;cursor:pointer;font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;transition:var(--fast);flex-shrink:0;}
+.file-remove:hover{background:var(--err);color:#fff;}
+
+/* UPLOAD PROGRESS */
+.upload-progress{margin-top:10px;display:none;}
+.upload-progress-bar{height:3px;background:var(--c4);position:relative;overflow:hidden;}
+.upload-progress-fill{height:100%;background:var(--hi);width:0%;transition:width 0.3s var(--ease);}
+.upload-progress-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--t2);margin-top:4px;}
+
+/* FILE ATTACHMENT CHIP */
+.attach-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(60,239,255,0.08);
+  border:1px solid rgba(60,239,255,0.2);
+  color:var(--hi3);
+  padding:2px 8px;
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  cursor:pointer;
+  transition:var(--fast);
+  margin-left:6px;
+}
+.attach-chip:hover{background:var(--hi3);color:var(--c0);}
+[data-theme="light"] .attach-chip{color:#0086cc;background:rgba(0,134,204,0.07);border-color:rgba(0,134,204,0.2);}
+
+/* ─── DASHBOARD ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{
+  padding:22px 24px;
+  background:var(--c1);
+  border:1px solid var(--bd2);
+  position:relative;
+  overflow:hidden;
+  transition:var(--fast);
+}
+.stat-card::after{content:'';position:absolute;inset:0;background:var(--card-shine);pointer-events:none;}
+.stat-card:hover{border-color:var(--bd);transform:translateY(-2px);}
+.stat-card-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.16em;color:var(--t3);margin-bottom:10px;}
+.stat-card-value{font-size:2.6rem;font-weight:700;letter-spacing:-0.05em;line-height:1;color:var(--tx);}
+.stat-card-sub{font-size:11px;color:var(--t2);margin-top:6px;}
+.stat-card-accent{position:absolute;bottom:0;left:0;height:3px;width:100%;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;}
+
+/* BAR CHART */
+.chart-panel{padding:24px 26px;}
+.chart-panel h3{font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t2);margin-bottom:18px;font-family:'Space Mono',monospace;}
+.bar-chart{display:flex;flex-direction:column;gap:10px;}
+.bar-row{display:flex;align-items:center;gap:12px;}
+.bar-label{font-size:12px;color:var(--t2);width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:10px;background:var(--c3);position:relative;overflow:hidden;}
+.bar-fill{height:100%;background:var(--hi);transition:width 0.8s var(--ease);position:relative;}
+[data-theme="light"] .bar-fill{background:var(--hi);}
+.bar-val{font-family:'Space Mono',monospace;font-size:11px;color:var(--hi);width:28px;text-align:right;flex-shrink:0;}
+
+/* RECENT PANEL */
+.recent-panel{padding:24px 26px;}
+.recent-panel h3{font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t2);margin-bottom:18px;font-family:'Space Mono',monospace;}
+.recent-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd2);align-items:flex-start;}
+.recent-item:last-child{border-bottom:none;}
+.recent-no{font-family:'Space Mono',monospace;font-size:11px;color:var(--hi);background:var(--hib);border:1px solid var(--bd);padding:2px 7px;flex-shrink:0;}
+.recent-info{flex:1;min-width:0;}
+.recent-dept{font-size:11px;color:var(--t3);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;}
+.recent-desc{font-size:13px;color:var(--tx);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.recent-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);flex-shrink:0;}
+
+/* WEEKLY SPARK */
+.spark-row{display:flex;align-items:flex-end;gap:4px;height:48px;margin-top:8px;}
+.spark-bar{flex:1;background:var(--hi);opacity:0.7;transition:height 0.6s var(--ease),opacity var(--fast);border-radius:0;}
+.spark-bar:hover{opacity:1;}
+.spark-labels{display:flex;justify-content:space-between;margin-top:4px;}
+.spark-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);text-align:center;flex:1;}
+
+/* ADMIN */
+.admin-bento{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.admin-card{padding:24px 26px;}
+.admin-card h3{font-size:1rem;letter-spacing:-0.02em;font-weight:700;text-transform:uppercase;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:10px;}
+.icon-sq{width:32px;height:32px;background:var(--hib);border:1px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+#deptList{list-style:none;padding:0;margin:12px 0 0 0;}
+#deptList li{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border:1px solid var(--bd2);background:var(--c2);margin-bottom:6px;font-size:13.5px;transition:var(--fast);}
+#deptList li:hover{border-color:var(--bd);background:var(--hib);transform:translateX(3px);}
+.dept-row{display:flex;gap:8px;align-items:stretch;}
+.dept-row input{flex:1;}
+.dept-add{background:var(--hi);color:var(--c0);border:none;padding:0 18px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:var(--fast);border-radius:0;white-space:nowrap;}
+.dept-add:hover{filter:brightness(1.1);transform:translateY(-1px);}
+[data-theme="light"] .dept-add{color:#04040a;}
+
+/* MODAL - USER */
+#userModal,#fileModal{display:none;position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;z-index:1000;}
+.modal-inner{width:420px;background:var(--c1);border:1px solid var(--bd);padding:28px 30px;position:relative;animation:modalIn 0.32s var(--ease);}
+@keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-inner::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 28px 28px 0;border-color:transparent var(--hi) transparent transparent;}
+.modal-inner h3{font-size:1.4rem;letter-spacing:-0.03em;margin-bottom:4px;}
+
+/* MODAL - FILES */
+.file-modal-inner{width:680px;max-height:80vh;overflow-y:auto;background:var(--c1);border:1px solid var(--bd);padding:28px 30px;position:relative;animation:modalIn 0.32s var(--ease);}
+.file-modal-inner::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 28px 28px 0;border-color:transparent var(--hi) transparent transparent;}
+.file-modal-inner h3{font-size:1.4rem;letter-spacing:-0.03em;margin-bottom:16px;}
+.file-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
+.file-grid-item{border:1px solid var(--bd2);background:var(--c2);padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:var(--fast);}
+.file-grid-item:hover{border-color:var(--bd);background:var(--hib);}
+.file-grid-item img{width:100%;height:100px;object-fit:cover;display:block;}
+.file-grid-item .file-grid-icon{width:100%;height:100px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.file-grid-item .file-grid-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--t2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
+
+/* LOGIN */
+#loginBox{max-width:440px;margin:70px auto;padding:44px 42px;text-align:center;background:var(--c1);border:1px solid var(--bd2);position:relative;animation:loginIn 0.55s var(--ease);}
+@keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+#loginBox::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 44px 44px 0;border-color:transparent var(--hi) transparent transparent;}
+#loginBox::after{content:'';position:absolute;bottom:0;left:0;width:0;height:0;border-style:solid;border-width:0 0 44px 44px;border-color:transparent transparent var(--hi2) transparent;}
+.login-theme-btn{position:absolute;top:16px;left:16px;width:32px;height:32px;background:var(--c2);border:1px solid var(--bd2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--fast);border-radius:0;}
+.login-theme-btn:hover{background:var(--hib);color:var(--hi);border-color:var(--bd);transform:rotate(15deg);}
+.login-theme-btn svg{width:15px;height:15px;}
+.login-logo{width:52px;height:52px;background:var(--hi);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--c0);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));}
+[data-theme="light"] .login-logo{color:#04040a;}
+#loginBox h1{font-size:2.2rem;letter-spacing:-0.05em;font-weight:700;margin-bottom:4px;text-transform:uppercase;}
+.login-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:28px;display:block;}
+#loginBox input{margin-bottom:10px;padding:13px 14px;text-align:left;font-size:14px;}
+#loginBox .btn-primary{font-size:13px;padding:14px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:70px 20px;}
+.empty-icon{width:52px;height:52px;background:var(--hib);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;}
+.empty-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:5px;}
+.empty-text{font-size:13px;color:var(--t2);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--c4);border-radius:0;border:2px solid var(--c0);}
+::-webkit-scrollbar-thumb:hover{background:var(--c5);}
+::selection{background:var(--hi);color:var(--c0);}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.dash-grid{grid-template-columns:1fr;}}
+@media(max-width:900px){nav{padding:0 14px;flex-wrap:wrap;height:auto;min-height:58px;}.wrap{padding:20px 14px;}.filter-row{grid-template-columns:1fr 1fr;}.admin-bento{grid-template-columns:1fr;}.page-hdr h2{font-size:2rem;}.file-modal-inner{width:95vw;}.file-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.filter-row{grid-template-columns:1fr;}nav button{font-size:11px;padding:6px 10px;}.stats-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ── FILE MODAL ── -->
+<div id="fileModal">
+  <div class="file-modal-inner">
+    <h3>Eklenen Dosyalar</h3>
+    <span style="display:block;color:var(--t2);font-size:12px;margin-bottom:4px;font-family:'Space Mono',monospace;letter-spacing:0.04em;" id="fileModalSub"></span>
+    <div class="file-grid" id="fileModalGrid"></div>
+    <button class="btn-cancel" style="margin-top:20px;" onclick="closeFileModal()">Kapat</button>
+  </div>
+</div>
+
+<!-- ── USER MODAL ── -->
+<div id="userModal">
+  <div class="modal-inner">
+    <h3>Kullanıcı Düzenle</h3>
+    <span style="display:block;color:var(--t2);font-size:12px;margin-bottom:14px;font-family:'Space Mono',monospace;letter-spacing:0.04em;">YETKİ VE BİLGİLERİ GÜNCELLE</span>
+    <input id="editUid" type="hidden">
+    <label>E-posta</label><input id="editEmail">
+    <label style="margin-top:14px;">Yetki</label>
+    <select id="editRole">
+      <option value="gözlemci">Gözlemci</option>
+      <option value="standart">Standart</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button class="btn-primary" onclick="updateUser()">Değişiklikleri Kaydet</button>
+    <button class="btn-cancel" onclick="closeModal()">İptal</button>
+  </div>
+</div>
+
+<!-- ── LOGIN ── -->
+<div id="loginBox">
+  <button class="login-theme-btn" onclick="toggleTheme()">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <div class="login-logo">T</div>
+  <h1>Talep<br>Notları</h1>
+  <span class="login-sub">Kurumsal talep yönetimi // v4.0</span>
+  <input id="luser" placeholder="E-posta adresiniz">
+  <input id="lpass" type="password" placeholder="Şifreniz">
+  <button class="btn-primary" onclick="login()">Giriş Yap →</button>
+</div>
+
+<!-- ── PANEL ── -->
+<div id="panel" style="display:none;">
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-logo">T</div>
+      Talep&nbsp;Notları
+    </div>
+    <button id="nav-dashboard" onclick="show('dashboard')">Dashboard</button>
+    <button id="nav-list" class="active" onclick="show('list')">Talepler</button>
+    <button id="nav-new" onclick="show('new')">Yeni Talep</button>
+    <button id="nav-admin" style="display:none;" onclick="show('admin')">Yönetim</button>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="logout-btn" onclick="logout()">Çıkış</button>
+  </nav>
+
+  <div class="wrap">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="dashboard" class="section">
+      <div class="page-hdr">
+        <h2>Genel <em>Bakış</em></h2>
+        <p>Anlık istatistikler ve departman dağılımı</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Toplam Talep</div>
+          <div class="stat-card-value" id="statTotal">—</div>
+          <div class="stat-card-sub">Tüm zamanlar</div>
+          <div class="stat-card-accent" style="background:var(--hi);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Bugün</div>
+          <div class="stat-card-value" id="statToday">—</div>
+          <div class="stat-card-sub" id="statTodayDate">—</div>
+          <div class="stat-card-accent" style="background:var(--hi3);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Bu Hafta</div>
+          <div class="stat-card-value" id="statWeek">—</div>
+          <div class="stat-card-sub">Son 7 gün</div>
+          <div class="stat-card-accent" style="background:var(--hi2);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Departman</div>
+          <div class="stat-card-value" id="statDepts">—</div>
+          <div class="stat-card-sub">Aktif bölüm</div>
+          <div class="stat-card-accent" style="background:var(--hi4);"></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- BAR CHART -->
+        <div class="panel panel-clip chart-panel">
+          <h3>📊 Departman Bazlı Dağılım</h3>
+          <div class="bar-chart" id="deptChart"></div>
+        </div>
+
+        <!-- RECENT -->
+        <div class="panel panel-clip recent-panel">
+          <h3>🕐 Son Talepler</h3>
+          <div id="recentList"></div>
+        </div>
+      </div>
+
+      <!-- WEEKLY SPARK -->
+      <div class="panel" style="padding:24px 26px;margin-top:16px;">
+        <h3 style="font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t2);margin-bottom:14px;">📅 Son 7 Günlük Aktivite</h3>
+        <div class="spark-row" id="sparkRow"></div>
+        <div class="spark-labels" id="sparkLabels"></div>
+      </div>
+    </div>
+
+    <!-- ── LIST ── -->
+    <div id="list" class="section active-section">
+      <div class="page-hdr">
+        <h2>Tüm <em>Talepler</em></h2>
+        <p>Filtreleyin · Arayın · Dışa aktarın</p>
+      </div>
+      <div class="panel panel-clip" style="margin-bottom:16px;">
+        <div class="filter-row">
+          <div><label>Arama</label><input id="search" placeholder="Talep no veya açıklama..." oninput="render()"></div>
+          <div><label>Bölüm</label><select id="filterDept" onchange="render()"><option value="">Tüm Bölümler</option></select></div>
+          <div><label>Başlangıç</label><input type="date" id="filterStart" onchange="render()"></div>
+          <div><label>Bitiş</label><input type="date" id="filterEnd" onchange="render()"></div>
+          <div style="padding-bottom:0;">
+            <button class="btn-excel" onclick="exportToExcel()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Excel
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tarih / Saat</th>
+              <th>Bölüm</th>
+              <th>Açıklama</th>
+              <th>Kullanıcı</th>
+              <th style="text-align:right;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── NEW ── -->
+    <div id="new" class="section">
+      <div class="page-hdr">
+        <h2>Yeni <em>Kayıt</em></h2>
+        <p>Yeni talep oluştur veya mevcut kaydı düzenle</p>
+      </div>
+      <div class="form-wrap">
+        <div class="panel panel-clip form-panel">
+          <h3 id="formTitle">Talep Detayı</h3>
+          <span class="form-sub">Aşağıdaki alanları doldurarak kaydı sisteme işleyin</span>
+          <div class="divider"><span>bilgiler</span></div>
+          <input id="docId" type="hidden">
+          <label>Talep No</label><input id="no">
+          <label style="margin-top:14px;">Tarih</label><input id="date" type="date">
+          <label style="margin-top:14px;">Departman</label><select id="deptSelect"></select>
+          <label style="margin-top:14px;">Açıklama</label>
+          <textarea id="desc" rows="5" placeholder="Talep detaylarını buraya yazın..."></textarea>
+
+          <div class="divider"><span>dosya ekle (isteğe bağlı)</span></div>
+
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" onchange="handleFiles(this.files)">
+            <span class="upload-icon">📎</span>
+            <div class="upload-label">Dosyaları buraya sürükle veya <span>seçmek için tıkla</span></div>
+            <div class="upload-hint">Görsel, PDF, Word, Excel · Maks 10MB/dosya</div>
+          </div>
+
+          <div class="file-preview-list" id="filePreviewList"></div>
+
+          <div class="upload-progress" id="uploadProgress">
+            <div class="upload-progress-bar"><div class="upload-progress-fill" id="uploadFill"></div></div>
+            <div class="upload-progress-text" id="uploadText">Yükleniyor...</div>
+          </div>
+
+          <button class="btn-primary" onclick="saveRecord()">Sisteme Kaydet →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADMIN ── -->
+    <div id="admin" class="section">
+      <div class="page-hdr">
+        <h2>Sistem <em>Yönetimi</em></h2>
+        <p>Departman · Kullanıcı · Yetki</p>
+      </div>
+      <div class="admin-bento">
+        <div class="panel panel-clip admin-card">
+          <h3><span class="icon-sq">🏢</span> Departmanlar</h3>
+          <div class="dept-row">
+            <input id="newDeptName" placeholder="Yeni departman adı">
+            <button class="dept-add" onclick="addDept()">+ Ekle</button>
+          </div>
+          <ul id="deptList"></ul>
+        </div>
+        <div class="panel panel-clip admin-card">
+          <h3><span class="icon-sq">👤</span> Kullanıcı Tanımla</h3>
+          <label>E-posta</label>
+          <input id="newEmail" placeholder="ornek@firma.com">
+          <label style="margin-top:12px;">Şifre</label>
+          <input id="newPass" type="password" placeholder="Güvenli bir şifre">
+          <label style="margin-top:12px;">Yetki Seviyesi</label>
+          <select id="newRole">
+            <option value="gözlemci">Gözlemci</option>
+            <option value="standart">Standart</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button class="btn-primary" onclick="createNewUser()">Kullanıcı Oluştur →</button>
+        </div>
+        <div class="panel admin-card" style="grid-column:span 2;">
+          <h3><span class="icon-sq">⚙</span> Kullanıcı Yönetimi</h3>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>E-posta</th><th>Rol</th><th style="text-align:right;">İşlem</th></tr></thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.toggleTheme = function(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const nxt = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',nxt);
+  localStorage.setItem('talep-theme',nxt);
+};
+</script>
+
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, getDoc, setDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+const cfg = {
+  apiKey:"AIzaSyAuSzUO0Ru9DP_ffGJLE7eNGjFJn3KLQ68",
+  authDomain:"talep-notlari.firebaseapp.com",
+  projectId:"talep-notlari",
+  storageBucket:"talep-notlari.firebasestorage.app"
+};
+const app     = initializeApp(cfg);
+const db      = getFirestore(app);
+const auth    = getAuth(app);
+const storage = getStorage(app);
+
+let me=null, role="gözlemci", all=[], filtered=[];
+let pendingFiles = []; // {file, previewUrl, name, size}
+
+const today   = ()=> new Date().toISOString().split('T')[0];
+const timeNow = ()=> new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+const fmtSize = b=> b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(0)+' KB';
+const isImage = n=> /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(n);
+
+// ── FILE HANDLING ──
+window.handleFiles = function(files){
+  Array.from(files).forEach(f=>{
+    if(f.size > 10*1024*1024){ alert(`${f.name} 10MB'dan büyük!`); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingFiles.push({file:f, previewUrl: isImage(f.name)?e.target.result:null, name:f.name, size:f.size});
+      renderPreviews();
+    };
+    reader.readAsDataURL(f);
+  });
+  document.getElementById('fileInput').value='';
+};
+
+function renderPreviews(){
+  const list = document.getElementById('filePreviewList');
+  list.innerHTML = pendingFiles.map((pf,i)=>`
+    <div class="file-preview-item">
+      ${pf.previewUrl
+        ? `<img class="file-thumb" src="${pf.previewUrl}" alt="${pf.name}">`
+        : `<div class="file-icon">${getFileEmoji(pf.name)}</div>`}
+      <span class="file-name">${pf.name}</span>
+      <span class="file-size">${fmtSize(pf.size)}</span>
+      <button class="file-remove" onclick="removePendingFile(${i})">✖</button>
+    </div>
+  `).join('');
+}
+
+window.removePendingFile = function(i){
+  pendingFiles.splice(i,1);
+  renderPreviews();
+};
+
+function getFileEmoji(name){
+  if(/\.pdf$/i.test(name)) return '📄';
+  if(/\.(doc|docx)$/i.test(name)) return '📝';
+  if(/\.(xls|xlsx)$/i.test(name)) return '📊';
+  if(isImage(name)) return '🖼';
+  return '📎';
+}
+
+async function uploadFiles(recordId){
+  if(!pendingFiles.length) return [];
+  const urls = [];
+  const prog = document.getElementById('uploadProgress');
+  const fill = document.getElementById('uploadFill');
+  const txt  = document.getElementById('uploadText');
+  prog.style.display='block';
+
+  for(let i=0;i<pendingFiles.length;i++){
+    const pf = pendingFiles[i];
+    const storageRef = ref(storage, `records/${recordId}/${Date.now()}_${pf.name}`);
+    await new Promise((res,rej)=>{
+      const task = uploadBytesResumable(storageRef, pf.file);
+      task.on('state_changed',
+        snap=>{
+          const pct = Math.round(((i/pendingFiles.length)+(snap.bytesTransferred/snap.totalBytes/pendingFiles.length))*100);
+          fill.style.width=pct+'%';
+          txt.textContent=`Yükleniyor: ${pf.name} (${pct}%)`;
+        },
+        rej,
+        async()=>{
+          const url = await getDownloadURL(task.snapshot.ref);
+          urls.push({name:pf.name, url, path:storageRef.fullPath});
+          res();
+        }
+      );
+    });
+  }
+  fill.style.width='100%';
+  txt.textContent='Tamamlandı!';
+  setTimeout(()=>{prog.style.display='none';fill.style.width='0%';},1200);
+  return urls;
+}
+
+// ── RESET FORM ──
+function resetForm(){
+  document.getElementById("docId").value="";
+  document.getElementById("no").value="";
+  document.getElementById("date").value=today();
+  document.getElementById("desc").value="";
+  document.getElementById("formTitle").textContent="Talep Detayı";
+  const ds=document.getElementById("deptSelect");
+  if(ds.options.length) ds.selectedIndex=0;
+  pendingFiles=[];
+  renderPreviews();
+  document.getElementById('uploadProgress').style.display='none';
+}
+
+// ── AUTH ──
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    me=user;
+    const ud=await getDoc(doc(db,"users",user.uid));
+    role=ud.exists()?ud.data().role:"gözlemci";
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("panel").style.display="block";
+    document.getElementById("nav-admin").style.display=role==="admin"?"inline-flex":"none";
+    document.getElementById("nav-new").style.display=role==="gözlemci"?"none":"inline-flex";
+    document.getElementById("date").value=today();
+    document.getElementById("filterStart").value=today();
+    document.getElementById("filterEnd").value=today();
+    init();
+  }else{
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("panel").style.display="none";
+  }
+});
+
+window.login=()=>{
+  const e=document.getElementById("luser").value,p=document.getElementById("lpass").value;
+  signInWithEmailAndPassword(auth,e,p).catch(err=>alert(err.message));
+};
+
+function init(){
+  onSnapshot(collection(db,"records"),snap=>{
+    all=[];
+    snap.forEach(d=>all.push({id:d.id,...d.data()}));
+    render();
+    renderDashboard();
+  });
+  onSnapshot(collection(db,"departments"),snap=>{
+    let opts='',list='',fOpts='<option value="">Tüm Bölümler</option>';
+    snap.forEach(d=>{
+      opts +=`<option value="${d.data().name}">${d.data().name}</option>`;
+      fOpts+=`<option value="${d.data().name}">${d.data().name}</option>`;
+      list +=`<li>${d.data().name}<button class="act act-del" onclick="deleteDept('${d.id}')">✖</button></li>`;
+    });
+    document.getElementById("deptSelect").innerHTML=opts;
+    document.getElementById("filterDept").innerHTML=fOpts;
+    document.getElementById("deptList").innerHTML=list;
+    renderDashboard();
+  });
+  if(role==="admin"){
+    onSnapshot(collection(db,"users"),snap=>{
+      let html='';
+      snap.forEach(u=>{
+        html+=`<tr>
+          <td>${u.data().email}</td>
+          <td><span class="role-badge">${u.data().role}</span></td>
+          <td style="text-align:right;">
+            <button class="act act-edit" onclick="openUserModal('${u.id}','${u.data().email}','${u.data().role}')">✏ Düzenle</button>
+            <button class="act act-del" onclick="deleteUser('${u.id}')">🗑 Sil</button>
+          </td>
+        </tr>`;
+      });
+      document.getElementById("userTableBody").innerHTML=html;
+    });
+  }
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const t = today();
+  const totalEl  = document.getElementById('statTotal');
+  const todayEl  = document.getElementById('statToday');
+  const weekEl   = document.getElementById('statWeek');
+  const deptsEl  = document.getElementById('statDepts');
+  const dateEl   = document.getElementById('statTodayDate');
+  if(!totalEl) return;
+
+  const todayCount = all.filter(r=>r.date===t).length;
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate()-7);
+  const weekCount = all.filter(r=> new Date(r.date)>=weekAgo).length;
+  const depts = [...new Set(all.map(r=>r.dept).filter(Boolean))];
+
+  totalEl.textContent = all.length;
+  todayEl.textContent = todayCount;
+  weekEl.textContent  = weekCount;
+  deptsEl.textContent = depts.length;
+  dateEl.textContent  = new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
+
+  // Dept bar chart
+  const deptCounts = {};
+  all.forEach(r=>{ if(r.dept) deptCounts[r.dept]=(deptCounts[r.dept]||0)+1; });
+  const sorted = Object.entries(deptCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max = sorted.length ? sorted[0][1] : 1;
+  const chartEl = document.getElementById('deptChart');
+  if(chartEl){
+    if(!sorted.length){
+      chartEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz veri yok.</div>';
+    } else {
+      chartEl.innerHTML = sorted.map(([dept,count])=>`
+        <div class="bar-row">
+          <span class="bar-label" title="${dept}">${dept}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${Math.round(count/max*100)}%"></div>
+          </div>
+          <span class="bar-val">${count}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Recent list
+  const recentEl = document.getElementById('recentList');
+  if(recentEl){
+    const recent = [...all].sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||''))).slice(0,6);
+    if(!recent.length){
+      recentEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz talep yok.</div>';
+    } else {
+      recentEl.innerHTML = recent.map(r=>`
+        <div class="recent-item">
+          <span class="recent-no">#${r.no}</span>
+          <div class="recent-info">
+            <div class="recent-dept">${r.dept||'—'}</div>
+            <div class="recent-desc">${r.desc||'—'}</div>
+          </div>
+          <span class="recent-time">${r.time||r.date||''}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Spark chart — last 7 days
+  const sparkEl  = document.getElementById('sparkRow');
+  const labelEl  = document.getElementById('sparkLabels');
+  if(sparkEl && labelEl){
+    const days=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      days.push(d.toISOString().split('T')[0]);
+    }
+    const counts = days.map(d=>all.filter(r=>r.date===d).length);
+    const maxC = Math.max(...counts,1);
+    sparkEl.innerHTML = counts.map(c=>`
+      <div class="spark-bar" style="height:${Math.max(4,Math.round(c/maxC*48))}px;" title="${c} talep"></div>
+    `).join('');
+    labelEl.innerHTML = days.map(d=>`
+      <span class="spark-label">${new Date(d+'T12:00:00').toLocaleDateString('tr-TR',{weekday:'short'})}</span>
+    `).join('');
+  }
+}
+
+// ── RENDER TABLE ──
+window.render=()=>{
+  const s  =document.getElementById("search").value.toLowerCase();
+  const st =document.getElementById("filterStart").value;
+  const en =document.getElementById("filterEnd").value;
+  const dep=document.getElementById("filterDept").value;
+
+  filtered=all.filter(r=>{
+    const mS=String(r.no).includes(s)||r.desc.toLowerCase().includes(s);
+    const mD=(!st||r.date>=st)&&(!en||r.date<=en);
+    const mDp=!dep||r.dept===dep;
+    return mS&&mD&&mDp;
+  }).sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
+
+  let html='';
+  if(!filtered.length){
+    html=`<tr><td colspan="6"><div class="empty">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">Kayıt bulunamadı</div>
+      <div class="empty-text">Filtreleri değiştirin veya yeni bir talep oluşturun.</div>
+    </div></td></tr>`;
+  } else {
+    filtered.forEach(r=>{
+      const hasFiles = r.files && r.files.length>0;
+      html+=`<tr>
+        <td><b>#${r.no}</b></td>
+        <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--t2);">
+          ${r.date}<span class="time-chip">${r.time||''}</span>
+        </td>
+        <td>${r.dept}</td>
+        <td style="max-width:300px;">
+          ${r.desc}
+          ${hasFiles?`<span class="attach-chip" onclick="openFileModal('${r.id}')">📎 ${r.files.length} dosya</span>`:''}
+        </td>
+        <td style="color:var(--t2);font-size:12.5px;">${r.user}</td>
+        <td style="text-align:right;white-space:nowrap;">
+          ${role!=='gözlemci'?`<button class="act act-edit" onclick="editRecord('${r.id}')">✏ Düzenle</button>`:''}
+          ${role==='admin'?`<button class="act act-del" onclick="deleteRecord('${r.id}')">🗑 Sil</button>`:''}
+        </td>
+      </tr>`;
+    });
+  }
+  document.getElementById("tb").innerHTML=html;
+};
+
+// ── FILE MODAL ──
+window.openFileModal = function(id){
+  const r = all.find(x=>x.id===id);
+  if(!r||!r.files||!r.files.length) return;
+  document.getElementById('fileModalSub').textContent=`Talep #${r.no} · ${r.files.length} dosya`;
+  document.getElementById('fileModalGrid').innerHTML = r.files.map(f=>`
+    <a class="file-grid-item" href="${f.url}" target="_blank" rel="noopener">
+      ${isImage(f.name)
+        ? `<img src="${f.url}" alt="${f.name}" loading="lazy">`
+        : `<div class="file-grid-icon">${getFileEmoji(f.name)}</div>`}
+      <span class="file-grid-name">${f.name}</span>
+    </a>
+  `).join('');
+  document.getElementById('fileModal').style.display='flex';
+};
+window.closeFileModal=()=>document.getElementById('fileModal').style.display='none';
+
+// ── SAVE ──
+window.saveRecord=async()=>{
+  const existingId = document.getElementById("docId").value;
+
+  // Upload files first (use temp id if new)
+  const targetId = existingId || ('temp_'+Date.now());
+  const newFiles = await uploadFiles(targetId);
+
+  // Merge with existing files if editing
+  let files = newFiles;
+  if(existingId){
+    const existing = all.find(x=>x.id===existingId);
+    files = [...(existing?.files||[]), ...newFiles];
+  }
+
+  const data={
+    no:document.getElementById("no").value,
+    date:document.getElementById("date").value,
+    time:timeNow(),
+    dept:document.getElementById("deptSelect").value,
+    desc:document.getElementById("desc").value,
+    user:me.email,
+    files
+  };
+
+  if(existingId){
+    await updateDoc(doc(db,"records",existingId),data);
+  } else {
+    // If we used a temp id for storage, move the doc reference
+    const docRef = await addDoc(collection(db,"records"),data);
+    // Rename storage files to proper record id (optional — skipped for simplicity)
+    _ = docRef;
+  }
+
+  resetForm();
+  show('list');
+};
+
+window.deleteRecord=async id=>{
+  if(!confirm("Kaydı Sil?")) return;
+  const r = all.find(x=>x.id===id);
+  // Also delete storage files
+  if(r && r.files && r.files.length){
+    for(const f of r.files){
+      try{ await deleteObject(ref(storage, f.path)); }catch(e){}
+    }
+  }
+  await deleteDoc(doc(db,"records",id));
+};
+
+window.editRecord=id=>{
+  const r=all.find(x=>x.id===id);
+  document.getElementById("docId").value=r.id;
+  document.getElementById("no").value=r.no;
+  document.getElementById("date").value=r.date;
+  document.getElementById("deptSelect").value=r.dept;
+  document.getElementById("desc").value=r.desc;
+  document.getElementById("formTitle").textContent="Kaydı Düzenle";
+  pendingFiles=[];
+  renderPreviews();
+  show('new');
+};
+
+window.exportToExcel=()=>{
+  if(!filtered.length) return alert("İndirilecek veri bulunamadı!");
+  const rows=filtered.map(r=>({
+    "Talep No":r.no,"Tarih":r.date,"Saat":r.time||"",
+    "Bölüm":r.dept,"Açıklama":r.desc,"Ekleyen":r.user,
+    "Dosya Sayısı":(r.files||[]).length
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Talepler");
+  XLSX.writeFile(wb,`Talep_Raporu_${today()}.xlsx`);
+};
+
+window.show=id=>{
+  // Gözlemci yeni kayıt / düzenleme sayfasına erişemez
+  if(id==='new' && role==='gözlemci') return;
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active-section"));
+  document.getElementById(id).classList.add("active-section");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  const nb=document.getElementById('nav-'+id);
+  if(nb) nb.classList.add('active');
+  if(id==='new' && !document.getElementById("docId").value) resetForm();
+  if(id==='dashboard') renderDashboard();
+};
+
+window.addDept=async()=>{
+  const n=document.getElementById("newDeptName").value;
+  if(n) await addDoc(collection(db,"departments"),{name:n});
+  document.getElementById("newDeptName").value="";
+};
+window.deleteDept=async id=>confirm("Sil?")&&await deleteDoc(doc(db,"departments",id));
+window.createNewUser=async()=>{
+  const e=document.getElementById("newEmail").value,p=document.getElementById("newPass").value,r=document.getElementById("newRole").value;
+  const res=await createUserWithEmailAndPassword(auth,e,p);
+  await setDoc(doc(db,"users",res.user.uid),{email:e,role:r});
+  alert("Kullanıcı Eklendi");
+};
+window.deleteUser=async id=>confirm("Kullanıcıyı Sil?")&&await deleteDoc(doc(db,"users",id));
+window.logout=()=>signOut(auth);
+window.openUserModal=(uid,email,role)=>{
+  document.getElementById("editUid").value=uid;
+  document.getElementById("editEmail").value=email;
+  document.getElementById("editRole").value=role;
+  document.getElementById("userModal").style.display="flex";
+};
+window.closeModal=()=>document.getElementById("userModal").style.display="none";
+window.updateUser=async()=>{
+  await updateDoc(doc(db,"users",document.getElementById("editUid").value),{
+    email:document.getElementById("editEmail").value,
+    role:document.getElementById("editRole").value
+  });
+  closeModal();
+};
+</script>
+</body>
+</html>
