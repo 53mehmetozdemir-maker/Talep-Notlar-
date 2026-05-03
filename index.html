@@ -1289,7 +1289,7 @@ window.render=()=>{
 
       // Düzenle butonu: admin her zaman görür, diğerleri sadece kendi talebi
       const canEdit=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
-      const canDelete=role==='admin';
+      const canDelete=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
 
       html+=`<tr>
         <td><b>#${r.no}</b></td>
