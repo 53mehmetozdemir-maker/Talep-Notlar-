@@ -127,11 +127,9 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .upload-progress-text{font-family:'Space Mono',monospace;font-size:10px;color:var(--t2);margin-top:4px;}
 .attach-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(60,239,255,0.08);border:1px solid rgba(60,239,255,0.2);color:var(--hi3);padding:2px 8px;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:var(--fast);margin-left:6px;}
 .attach-chip:hover{background:var(--hi3);color:var(--c0);}
-/* DESC READ MORE */
 .desc-cell-text{font-size:13.5px;line-height:1.5;max-width:300px;word-break:break-word;}
 .desc-read-more{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--hi);cursor:pointer;border:none;background:transparent;padding:2px 0;transition:var(--fast);}
 .desc-read-more:hover{opacity:0.7;}
-/* DESC POPUP */
 #descModal{display:none;position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:1100;padding:20px;}
 .desc-modal-inner{width:580px;max-width:100%;max-height:82vh;background:var(--c1);border:1px solid var(--bd);padding:32px 36px 24px;position:relative;animation:modalIn 0.28s var(--ease);display:flex;flex-direction:column;overflow:hidden;}
 .desc-modal-inner::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 32px 32px 0;border-color:transparent var(--hi) transparent transparent;}
@@ -142,8 +140,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .desc-modal-body::-webkit-scrollbar-thumb{background:var(--c5);}
 .desc-modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:var(--c2);border:1px solid var(--bd2);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--fast);border-radius:0;}
 .desc-modal-close:hover{background:var(--err-bg);color:var(--err);border-color:var(--err-bd);}
-
-/* ===================== EDIT RECORD MODAL ===================== */
 #editRecordModal{display:none;position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(12px);align-items:center;justify-content:center;z-index:1200;padding:20px;}
 .edit-modal-inner{width:620px;max-width:100%;max-height:90vh;background:var(--c1);border:1px solid var(--bd);padding:32px 36px 28px;position:relative;animation:modalIn 0.32s var(--ease);display:flex;flex-direction:column;overflow-y:auto;}
 .edit-modal-inner::-webkit-scrollbar{width:4px;}
@@ -157,8 +153,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .edit-owner-badge{display:inline-flex;align-items:center;gap:6px;background:var(--hib2);border:1px solid rgba(255,60,172,0.3);color:var(--hi2);padding:5px 12px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px;}
 .edit-field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0;}
 .edit-field-full{margin-top:14px;}
-
-/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
 .stat-card{padding:22px 24px;background:var(--c1);border:1px solid var(--bd2);position:relative;overflow:hidden;transition:var(--fast);}
 .stat-card::after{content:'';position:absolute;inset:0;background:var(--card-shine);pointer-events:none;}
@@ -167,7 +161,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .stat-card-value{font-size:2.6rem;font-weight:700;letter-spacing:-0.05em;line-height:1;color:var(--tx);}
 .stat-card-sub{font-size:11px;color:var(--t2);margin-top:6px;}
 .stat-card-accent{position:absolute;bottom:0;left:0;height:3px;width:100%;}
-/* DASHBOARD GRID: 2 cols */
 .dash-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;}
 .chart-panel{padding:24px 26px;}
 .chart-panel h3{font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t2);margin-bottom:18px;font-family:'Space Mono',monospace;}
@@ -191,8 +184,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .spark-bar:hover{opacity:1;}
 .spark-labels{display:flex;justify-content:space-between;margin-top:4px;}
 .spark-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);text-align:center;flex:1;}
-
-/* ===================== DAĞITIM TAKVİMİ SAYFASI ===================== */
 .takvim-page-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
 .takvim-main{background:var(--c1);border:1px solid var(--bd2);padding:28px 30px;position:relative;overflow:hidden;}
 .takvim-main::after{content:'';position:absolute;inset:0;background:var(--card-shine);pointer-events:none;}
@@ -218,7 +209,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .takvim-person-tag{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;background:rgba(255,60,172,0.18);border:1px solid rgba(255,60,172,0.35);color:var(--hi2);padding:2px 6px;border-radius:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;line-height:1.4;}
 [data-theme="light"] .takvim-person-tag{background:rgba(226,0,106,0.1);border-color:rgba(226,0,106,0.3);color:var(--hi2);}
 .takvim-today-badge{position:absolute;top:6px;right:7px;width:6px;height:6px;background:var(--hi3);border-radius:50%;}
-/* sidebar */
 .takvim-sidebar{display:flex;flex-direction:column;gap:14px;}
 .takvim-sidebar-card{background:var(--c1);border:1px solid var(--bd2);padding:22px 22px;position:relative;overflow:hidden;}
 .takvim-sidebar-card::after{content:'';position:absolute;inset:0;background:var(--card-shine);pointer-events:none;}
@@ -233,7 +223,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .takvim-upcoming-date{font-family:'Space Mono',monospace;font-size:10px;color:var(--hi);background:var(--hib);border:1px solid var(--bd);padding:3px 7px;flex-shrink:0;letter-spacing:0.04em;}
 .takvim-upcoming-name{font-size:12px;color:var(--tx);font-weight:500;flex:1;}
 .takvim-upcoming-day{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);flex-shrink:0;}
-/* ADMIN */
 .admin-bento{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .admin-card{padding:24px 26px;}
 .admin-card h3{font-size:1rem;letter-spacing:-0.02em;font-weight:700;text-transform:uppercase;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:10px;}
@@ -246,7 +235,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .dept-add{background:var(--hi);color:var(--c0);border:none;padding:0 18px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:var(--fast);border-radius:0;white-space:nowrap;height:40px;}
 .dept-add:hover{filter:brightness(1.1);transform:translateY(-1px);}
 [data-theme="light"] .dept-add{color:#04040a;}
-/* ASSIGN ADMIN */
 .assign-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:12px;}
 .assign-row>div{flex:1;}
 .assign-list{list-style:none;padding:0;max-height:180px;overflow-y:auto;}
@@ -256,7 +244,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .assign-item:hover{border-color:rgba(255,60,172,0.3);background:var(--hib2);}
 .assign-date{font-family:'Space Mono',monospace;font-size:10px;color:var(--hi);letter-spacing:0.04em;}
 .assign-person{color:var(--tx);font-weight:500;flex:1;margin:0 10px;}
-/* MODALS */
 #userModal,#fileModal{display:none;position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(8px);align-items:center;justify-content:center;z-index:1000;}
 .modal-inner{width:420px;background:var(--c1);border:1px solid var(--bd);padding:28px 30px;position:relative;animation:modalIn 0.32s var(--ease);}
 @keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
@@ -271,7 +258,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .file-grid-item img{width:100%;height:100px;object-fit:cover;display:block;}
 .file-grid-item .file-grid-icon{width:100%;height:100px;display:flex;align-items:center;justify-content:center;font-size:36px;}
 .file-grid-item .file-grid-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--t2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
-/* LOGIN */
 #loginBox{max-width:440px;margin:70px auto;padding:44px 42px;text-align:center;background:var(--c1);border:1px solid var(--bd2);position:relative;animation:loginIn 0.55s var(--ease);}
 @keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
 #loginBox::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 44px 44px 0;border-color:transparent var(--hi) transparent transparent;}
@@ -313,7 +299,7 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
   </div>
 </div>
 
-<!-- EDIT RECORD MODAL (YENİ) -->
+<!-- EDIT RECORD MODAL -->
 <div id="editRecordModal">
   <div class="edit-modal-inner">
     <button class="edit-modal-close" onclick="closeEditRecordModal()">✕</button>
@@ -325,9 +311,7 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span id="editOwnerEmail">—</span>
     </div>
-
     <input id="editDocId" type="hidden">
-
     <div class="edit-field-row">
       <div>
         <label>Talep No</label>
@@ -339,20 +323,18 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
         <input id="editDate" type="date">
       </div>
     </div>
-
     <div class="edit-field-full">
       <label>Departman</label>
       <select id="editDeptSelect"></select>
     </div>
-
     <div class="edit-field-full">
       <label>Açıklama</label>
       <textarea id="editDesc" rows="6" placeholder="Talep detaylarını güncelleyin..."></textarea>
     </div>
-
     <div class="divider"><span>dosya ekle (isteğe bağlı)</span></div>
     <div class="upload-area" id="editUploadArea">
-      <input type="file" id="editFileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" onchange="handleEditFiles(this.files)">
+      <!-- DEĞİŞİKLİK 1: onchange kaldırıldı, JS ile bağlanıyor -->
+      <input type="file" id="editFileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
       <span class="upload-icon">📎</span>
       <div class="upload-label">Dosyaları buraya sürükle veya <span>seçmek için tıkla</span></div>
       <div class="upload-hint">Görsel, PDF, Word, Excel · Maks 10MB/dosya</div>
@@ -362,7 +344,6 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       <div class="upload-progress-bar"><div class="upload-progress-fill" id="editUploadFill"></div></div>
       <div class="upload-progress-text" id="editUploadText">Yükleniyor...</div>
     </div>
-
     <button class="btn-primary" id="editSaveBtn" onclick="saveEditRecord()" style="margin-top:20px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       Değişiklikleri Kaydet
@@ -483,7 +464,7 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       </div>
     </div>
 
-    <!-- TAKVİM SAYFASI -->
+    <!-- TAKVİM -->
     <div id="takvim" class="section">
       <div class="page-hdr">
         <h2>Talep <em>Dağıtım Takvimi</em></h2>
@@ -582,7 +563,8 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
           <textarea id="desc" rows="5" placeholder="Talep detaylarını buraya yazın..."></textarea>
           <div class="divider"><span>dosya ekle (isteğe bağlı)</span></div>
           <div class="upload-area" id="uploadArea">
-            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" onchange="handleFiles(this.files)">
+            <!-- DEĞİŞİKLİK 2: onchange kaldırıldı, JS ile bağlanıyor -->
+            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
             <span class="upload-icon">📎</span>
             <div class="upload-label">Dosyaları buraya sürükle veya <span>seçmek için tıkla</span></div>
             <div class="upload-hint">Görsel, PDF, Word, Excel · Maks 10MB/dosya</div>
@@ -705,7 +687,6 @@ const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const DAY_NAMES_SHORT=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
 
-/* ---- SYNC edit dept select with main dept select ---- */
 function syncEditDeptSelect(){
   const src=document.getElementById('deptSelect');
   const dst=document.getElementById('editDeptSelect');
@@ -715,7 +696,6 @@ function syncEditDeptSelect(){
   if(cur)dst.value=cur;
 }
 
-// DESC MODAL
 window.openDescModal=function(id){
   const r=all.find(x=>x.id===id);if(!r)return;
   document.getElementById('descModalBadge').textContent='#'+r.no;
@@ -727,29 +707,20 @@ window.openDescModal=function(id){
 window.closeDescModal=()=>{document.getElementById('descModal').style.display='none';};
 document.getElementById('descModal').addEventListener('click',e=>{if(e.target===document.getElementById('descModal'))window.closeDescModal();});
 
-/* ---- EDIT RECORD MODAL ---- */
 window.openEditRecordModal=function(id){
   const r=all.find(x=>x.id===id);
   if(!r)return;
-
-  // Sahiplik kontrolü: admin her zaman düzenleyebilir, diğerleri sadece kendi talebi
-  if(role!=='admin' && r.user!==me.email){
+  if(role!=='admin'&&r.user!==me.email){
     alert('Bu talebi sadece talebi oluşturan kişi ('+r.user+') düzenleyebilir.');
     return;
   }
-
-  // Alanları doldur
   document.getElementById('editDocId').value=r.id;
   document.getElementById('editNo').value=r.no;
   document.getElementById('editDate').value=r.date;
   document.getElementById('editDesc').value=r.desc||'';
   document.getElementById('editOwnerEmail').textContent=r.user||'—';
-
-  // Dept select'i senkronize et
   syncEditDeptSelect();
   document.getElementById('editDeptSelect').value=r.dept||'';
-
-  // Dosyaları sıfırla
   editPendingFiles=[];
   renderEditPreviews();
   document.getElementById('editUploadProgress').style.display='none';
@@ -757,7 +728,6 @@ window.openEditRecordModal=function(id){
   document.getElementById('editNoErrorMsg').classList.remove('visible');
   document.getElementById('editSaveBtn').disabled=false;
   document.getElementById('editFileInput').value='';
-
   document.getElementById('editRecordModal').style.display='flex';
 };
 
@@ -804,7 +774,6 @@ window.saveEditRecord=async function(){
   const noInp=document.getElementById('editNo');
   const noMsg=document.getElementById('editNoErrorMsg');
   const saveBtn=document.getElementById('editSaveBtn');
-
   const duplicate=all.find(r=>String(r.no).trim()===noVal&&r.id!==existingId);
   if(duplicate){
     noInp.classList.add('input-error');
@@ -812,11 +781,8 @@ window.saveEditRecord=async function(){
     noInp.focus();
     return;
   }
-
   saveBtn.disabled=true;
-
   try{
-    // Dosya yükleme (edit modal için ayrı progress elementleri)
     let newFiles=[];
     if(editPendingFiles.length){
       const fill=document.getElementById('editUploadFill');
@@ -840,10 +806,8 @@ window.saveEditRecord=async function(){
       fill.style.width='100%';txt.textContent='Tamamlandı!';
       setTimeout(()=>{prog.style.display='none';fill.style.width='0%';},1200);
     }
-
     const existing=all.find(x=>x.id===existingId);
     const mergedFiles=[...(existing?.files||[]),...newFiles];
-
     await updateDoc(doc(db,'records',existingId),{
       no:noVal,
       date:document.getElementById('editDate').value,
@@ -851,9 +815,7 @@ window.saveEditRecord=async function(){
       dept:document.getElementById('editDeptSelect').value,
       desc:document.getElementById('editDesc').value,
       files:mergedFiles
-      // user alanı değişmez — orijinal sahibi korunur
     });
-
     closeEditRecordModal();
   }catch(e){
     alert('Kayıt sırasında hata: '+e.message);
@@ -876,6 +838,7 @@ window.handleFiles=function(files){
   });
   document.getElementById('fileInput').value='';
 };
+
 function renderPreviews(){
   document.getElementById('filePreviewList').innerHTML=pendingFiles.map((pf,i)=>`
     <div class="file-preview-item">
@@ -885,7 +848,9 @@ function renderPreviews(){
       <button class="file-remove" onclick="removePendingFile(${i})">✖</button>
     </div>`).join('');
 }
+
 window.removePendingFile=function(i){pendingFiles.splice(i,1);renderPreviews();};
+
 function getFileEmoji(n){
   if(/\.pdf$/i.test(n))return'📄';
   if(/\.(doc|docx)$/i.test(n))return'📝';
@@ -893,6 +858,7 @@ function getFileEmoji(n){
   if(isImage(n))return'🖼';
   return'📎';
 }
+
 async function uploadFiles(recordId){
   if(!pendingFiles.length)return[];
   const urls=[];
@@ -918,6 +884,7 @@ async function uploadFiles(recordId){
   setTimeout(()=>{prog.style.display='none';fill.style.width='0%';},1200);
   return urls;
 }
+
 function resetForm(){
   document.getElementById("docId").value="";
   document.getElementById("no").value="";
@@ -931,6 +898,7 @@ function resetForm(){
   document.getElementById('no').classList.remove('input-error');
   document.getElementById('noErrorMsg').classList.remove('visible');
   document.getElementById('saveBtn').disabled=false;
+  document.getElementById('saveBtn').textContent='Sisteme Kaydet →';
 }
 
 onAuthStateChanged(auth,async user=>{
@@ -947,11 +915,35 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById("filterEnd").value='';
     document.getElementById("assignDate").value=today();
     init();
+
+    /* ===== DEĞİŞİKLİK 3: Event listener'lar JS ile bağlanıyor ===== */
+    const fi=document.getElementById('fileInput');
+    if(fi)fi.addEventListener('change',function(){window.handleFiles(this.files);});
+
+    const efi=document.getElementById('editFileInput');
+    if(efi)efi.addEventListener('change',function(){window.handleEditFiles(this.files);});
+
+    /* Sürükle-bırak desteği */
+    const ua=document.getElementById('uploadArea');
+    if(ua){
+      ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='var(--hi)';});
+      ua.addEventListener('dragleave',()=>{ua.style.borderColor='';});
+      ua.addEventListener('drop',e=>{e.preventDefault();ua.style.borderColor='';window.handleFiles(e.dataTransfer.files);});
+    }
+    const eua=document.getElementById('editUploadArea');
+    if(eua){
+      eua.addEventListener('dragover',e=>{e.preventDefault();eua.style.borderColor='var(--hi)';});
+      eua.addEventListener('dragleave',()=>{eua.style.borderColor='';});
+      eua.addEventListener('drop',e=>{e.preventDefault();eua.style.borderColor='';window.handleEditFiles(e.dataTransfer.files);});
+    }
+    /* ============================================================= */
+
   }else{
     document.getElementById("loginBox").style.display="block";
     document.getElementById("panel").style.display="none";
   }
 });
+
 window.login=()=>{
   const e=document.getElementById("luser").value,p=document.getElementById("lpass").value;
   signInWithEmailAndPassword(auth,e,p).catch(err=>alert(err.message));
@@ -972,7 +964,6 @@ function init(){
     document.getElementById("deptSelect").innerHTML=opts;
     document.getElementById("filterDept").innerHTML=fOpts;
     document.getElementById("deptList").innerHTML=list;
-    // edit modal dept select de güncelle
     document.getElementById("editDeptSelect").innerHTML=opts;
     renderDashboard();
   });
@@ -1001,7 +992,6 @@ function init(){
   }
 }
 
-/* ========== PERSONNEL ========== */
 function renderPersonnelList(){
   const ul=document.getElementById('personnelList');if(!ul)return;
   if(!personnelData.length){
@@ -1010,6 +1000,7 @@ function renderPersonnelList(){
   }
   ul.innerHTML=personnelData.map(p=>`<li><span>${p.name}</span><button class="act act-del" onclick="deletePersonnel('${p.id}')">✖</button></li>`).join('');
 }
+
 function renderAssignPersonSelect(){
   const sel=document.getElementById('assignPerson');if(!sel)return;
   const cur=sel.value;
@@ -1021,40 +1012,22 @@ window.addPersonnel=async function(){
   const fb=document.getElementById('personnelFeedback');
   const btn=document.getElementById('personnelAddBtn');
   const n=(inp.value||'').trim();
-  if(!n){
-    fb.style.display='block';fb.style.color='var(--err)';
-    fb.textContent='⚠ Personel adı boş olamaz.';
-    inp.focus();return;
-  }
-  if(personnelData.some(p=>p.name.toLowerCase()===n.toLowerCase())){
-    fb.style.display='block';fb.style.color='var(--warn)';
-    fb.textContent='⚠ Bu isim zaten listede mevcut.';
-    inp.focus();return;
-  }
-  btn.disabled=true;btn.textContent='...';
-  fb.style.display='none';
+  if(!n){fb.style.display='block';fb.style.color='var(--err)';fb.textContent='⚠ Personel adı boş olamaz.';inp.focus();return;}
+  if(personnelData.some(p=>p.name.toLowerCase()===n.toLowerCase())){fb.style.display='block';fb.style.color='var(--warn)';fb.textContent='⚠ Bu isim zaten listede mevcut.';inp.focus();return;}
+  btn.disabled=true;btn.textContent='...';fb.style.display='none';
   try{
     await addDoc(collection(db,'personnel'),{name:n,createdAt:new Date().toISOString()});
-    inp.value='';
-    fb.style.display='block';fb.style.color='var(--ok)';
-    fb.textContent='✓ '+n+' eklendi.';
+    inp.value='';fb.style.display='block';fb.style.color='var(--ok)';fb.textContent='✓ '+n+' eklendi.';
     setTimeout(()=>{fb.style.display='none';},2500);
-  }catch(e){
-    fb.style.display='block';fb.style.color='var(--err)';
-    fb.textContent='✖ Hata: '+e.message;
-  }finally{
-    btn.disabled=false;btn.textContent='+ Ekle';
-  }
+  }catch(e){fb.style.display='block';fb.style.color='var(--err)';fb.textContent='✖ Hata: '+e.message;}
+  finally{btn.disabled=false;btn.textContent='+ Ekle';}
 };
 
 window.deletePersonnel=async function(id){
   if(!confirm('Personeli listeden kaldır?'))return;
-  try{
-    await deleteDoc(doc(db,'personnel',id));
-  }catch(e){alert('Silme hatası: '+e.message);}
+  try{await deleteDoc(doc(db,'personnel',id));}catch(e){alert('Silme hatası: '+e.message);}
 };
 
-/* ========== ASSIGNMENTS ========== */
 function renderAssignList(){
   const ul=document.getElementById('distAssignList');if(!ul)return;
   const sorted=[...assignments].sort((a,b)=>a.date.localeCompare(b.date));
@@ -1066,17 +1039,18 @@ function renderAssignList(){
       <button class="act act-del" onclick="deleteAssignment('${a.id}')">✖</button>
     </li>`).join('');
 }
+
 window.addAssignment=async function(){
   const d=document.getElementById('assignDate').value;
   const p=document.getElementById('assignPerson').value;
   if(!d||!p){alert('Tarih ve personel seçiniz.');return;}
   await addDoc(collection(db,'distAssignments'),{date:d,personName:p});
 };
+
 window.deleteAssignment=async function(id){
   await deleteDoc(doc(db,'distAssignments',id));
 };
 
-/* ========== TAKVİM SAYFASI ========== */
 window.takvimPrev=function(){distViewMonth--;if(distViewMonth<0){distViewMonth=11;distViewYear--;}renderTakvim();};
 window.takvimNext=function(){distViewMonth++;if(distViewMonth>11){distViewMonth=0;distViewYear++;}renderTakvim();};
 
@@ -1086,27 +1060,17 @@ function renderTakvim(){
   const statsEl=document.getElementById('takvimPersonStats');
   const upcomingEl=document.getElementById('takvimUpcoming');
   if(!titleEl||!gridEl)return;
-
   const todayStr=today();
   titleEl.innerHTML=MONTH_NAMES[distViewMonth]+' <span>'+distViewYear+'</span>';
-
   const firstDay=new Date(distViewYear,distViewMonth,1);
   let startDow=(firstDay.getDay()+6)%7;
   const daysInMonth=new Date(distViewYear,distViewMonth+1,0).getDate();
   const prevDays=new Date(distViewYear,distViewMonth,0).getDate();
-
   const assignMap={};
-  assignments.forEach(a=>{
-    if(!assignMap[a.date])assignMap[a.date]=[];
-    assignMap[a.date].push(a.personName);
-  });
-
+  assignments.forEach(a=>{if(!assignMap[a.date])assignMap[a.date]=[];assignMap[a.date].push(a.personName);});
   const monthPfx=distViewYear+'-'+String(distViewMonth+1).padStart(2,'0');
-
   let html='';
-  for(let i=startDow-1;i>=0;i--){
-    html+=`<div class="takvim-cell other-month"><div class="takvim-day-num">${prevDays-i}</div></div>`;
-  }
+  for(let i=startDow-1;i>=0;i--){html+=`<div class="takvim-cell other-month"><div class="takvim-day-num">${prevDays-i}</div></div>`;}
   for(let d=1;d<=daysInMonth;d++){
     const dateStr=distViewYear+'-'+String(distViewMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const persons=assignMap[dateStr]||[];
@@ -1116,35 +1080,20 @@ function renderTakvim(){
     const isWeekend=dow===5||dow===6;
     const cls=['takvim-cell',isToday?'today':'',hasA?'has-assign':'',isWeekend?'weekend-cell':''].filter(Boolean).join(' ');
     const tags=persons.map(p=>`<div class="takvim-person-tag">${p}</div>`).join('');
-    html+=`<div class="${cls}">
-      <div class="takvim-day-num">${d}</div>
-      ${isToday?'<div class="takvim-today-badge"></div>':''}
-      ${tags}
-    </div>`;
+    html+=`<div class="${cls}"><div class="takvim-day-num">${d}</div>${isToday?'<div class="takvim-today-badge"></div>':''}${tags}</div>`;
   }
   const total=startDow+daysInMonth;
   const rem=total%7===0?0:7-(total%7);
-  for(let d=1;d<=rem;d++){
-    html+=`<div class="takvim-cell other-month"><div class="takvim-day-num">${d}</div></div>`;
-  }
+  for(let d=1;d<=rem;d++){html+=`<div class="takvim-cell other-month"><div class="takvim-day-num">${d}</div></div>`;}
   gridEl.innerHTML=html;
-
   if(statsEl){
     const thisMonthAssigns=assignments.filter(a=>a.date.startsWith(monthPfx));
     const personCount={};
     thisMonthAssigns.forEach(a=>{personCount[a.personName]=(personCount[a.personName]||0)+1;});
     const entries=Object.entries(personCount).sort((a,b)=>b[1]-a[1]);
-    if(!entries.length){
-      statsEl.innerHTML='<div style="color:var(--t3);font-size:12px;padding:6px 0;">Bu ay atama bulunmuyor.</div>';
-    }else{
-      statsEl.innerHTML=entries.map(([name,cnt])=>`
-        <div class="takvim-stat-row">
-          <span class="takvim-stat-name">${name}</span>
-          <span class="takvim-stat-count">${cnt} gün</span>
-        </div>`).join('');
-    }
+    if(!entries.length){statsEl.innerHTML='<div style="color:var(--t3);font-size:12px;padding:6px 0;">Bu ay atama bulunmuyor.</div>';}
+    else{statsEl.innerHTML=entries.map(([name,cnt])=>`<div class="takvim-stat-row"><span class="takvim-stat-name">${name}</span><span class="takvim-stat-count">${cnt} gün</span></div>`).join('');}
   }
-
   if(upcomingEl){
     const now=new Date();
     const upcoming=[];
@@ -1152,25 +1101,13 @@ function renderTakvim(){
       const d=new Date(now);d.setDate(now.getDate()+i);
       const ds=d.toISOString().split('T')[0];
       const persons=assignMap[ds]||[];
-      if(persons.length){
-        const dayName=DAY_NAMES_SHORT[(d.getDay()+6)%7];
-        persons.forEach(p=>upcoming.push({date:ds,name:p,dayName}));
-      }
+      if(persons.length){const dayName=DAY_NAMES_SHORT[(d.getDay()+6)%7];persons.forEach(p=>upcoming.push({date:ds,name:p,dayName}));}
     }
-    if(!upcoming.length){
-      upcomingEl.innerHTML='<div style="color:var(--t3);font-size:12px;padding:6px 0;">Önümüzdeki 14 günde görev yok.</div>';
-    }else{
-      upcomingEl.innerHTML=upcoming.map(u=>`
-        <div class="takvim-upcoming-item">
-          <span class="takvim-upcoming-date">${u.date.slice(5)}</span>
-          <span class="takvim-upcoming-name">${u.name}</span>
-          <span class="takvim-upcoming-day">${u.dayName}</span>
-        </div>`).join('');
-    }
+    if(!upcoming.length){upcomingEl.innerHTML='<div style="color:var(--t3);font-size:12px;padding:6px 0;">Önümüzdeki 14 günde görev yok.</div>';}
+    else{upcomingEl.innerHTML=upcoming.map(u=>`<div class="takvim-upcoming-item"><span class="takvim-upcoming-date">${u.date.slice(5)}</span><span class="takvim-upcoming-name">${u.name}</span><span class="takvim-upcoming-day">${u.dayName}</span></div>`).join('');}
   }
 }
 
-/* ========== DASHBOARD ========== */
 function renderDashboard(){
   const t=today();
   const totalEl=document.getElementById('statTotal');if(!totalEl)return;
@@ -1190,26 +1127,13 @@ function renderDashboard(){
   const chartEl=document.getElementById('deptChart');
   if(chartEl){
     if(!sorted.length){chartEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz veri yok.</div>';}
-    else{chartEl.innerHTML=sorted.map(([dept,count])=>`
-      <div class="bar-row">
-        <span class="bar-label" title="${dept}">${dept}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/max*100)}%"></div></div>
-        <span class="bar-val">${count}</span>
-      </div>`).join('');}
+    else{chartEl.innerHTML=sorted.map(([dept,count])=>`<div class="bar-row"><span class="bar-label" title="${dept}">${dept}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/max*100)}%"></div></div><span class="bar-val">${count}</span></div>`).join('');}
   }
   const recentEl=document.getElementById('recentList');
   if(recentEl){
     const recent=[...all].sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||''))).slice(0,6);
     if(!recent.length){recentEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz talep yok.</div>';}
-    else{recentEl.innerHTML=recent.map(r=>`
-      <div class="recent-item">
-        <span class="recent-no">#${r.no}</span>
-        <div class="recent-info">
-          <div class="recent-dept">${r.dept||'—'}</div>
-          <div class="recent-desc">${r.desc||'—'}</div>
-        </div>
-        <span class="recent-time">${r.time||r.date||''}</span>
-      </div>`).join('');}
+    else{recentEl.innerHTML=recent.map(r=>`<div class="recent-item"><span class="recent-no">#${r.no}</span><div class="recent-info"><div class="recent-dept">${r.dept||'—'}</div><div class="recent-desc">${r.desc||'—'}</div></div><span class="recent-time">${r.time||r.date||''}</span></div>`).join('');}
   }
   const sparkEl=document.getElementById('sparkRow');
   const labelEl=document.getElementById('sparkLabels');
@@ -1227,34 +1151,17 @@ let activeQuickFilter='all';
 
 window.clearQuickFilter=function(){
   activeQuickFilter='custom';
-  ['today','week','month','all'].forEach(m=>{
-    const btn=document.getElementById('qf-'+m);
-    if(btn) btn.classList.remove('qf-active');
-  });
+  ['today','week','month','all'].forEach(m=>{const btn=document.getElementById('qf-'+m);if(btn)btn.classList.remove('qf-active');});
 };
 
 window.setQuickFilter=function(mode){
   activeQuickFilter=mode;
-  ['today','week','month','all'].forEach(m=>{
-    const btn=document.getElementById('qf-'+m);
-    if(btn) btn.classList.toggle('qf-active',m===mode);
-  });
+  ['today','week','month','all'].forEach(m=>{const btn=document.getElementById('qf-'+m);if(btn)btn.classList.toggle('qf-active',m===mode);});
   const todayStr=today();
-  if(mode==='today'){
-    document.getElementById('filterStart').value=todayStr;
-    document.getElementById('filterEnd').value=todayStr;
-  }else if(mode==='week'){
-    const d=new Date();d.setDate(d.getDate()-7);
-    document.getElementById('filterStart').value=d.toISOString().split('T')[0];
-    document.getElementById('filterEnd').value=todayStr;
-  }else if(mode==='month'){
-    const d=new Date();d.setDate(d.getDate()-30);
-    document.getElementById('filterStart').value=d.toISOString().split('T')[0];
-    document.getElementById('filterEnd').value=todayStr;
-  }else{
-    document.getElementById('filterStart').value='';
-    document.getElementById('filterEnd').value='';
-  }
+  if(mode==='today'){document.getElementById('filterStart').value=todayStr;document.getElementById('filterEnd').value=todayStr;}
+  else if(mode==='week'){const d=new Date();d.setDate(d.getDate()-7);document.getElementById('filterStart').value=d.toISOString().split('T')[0];document.getElementById('filterEnd').value=todayStr;}
+  else if(mode==='month'){const d=new Date();d.setDate(d.getDate()-30);document.getElementById('filterStart').value=d.toISOString().split('T')[0];document.getElementById('filterEnd').value=todayStr;}
+  else{document.getElementById('filterStart').value='';document.getElementById('filterEnd').value='';}
   render();
 };
 
@@ -1269,16 +1176,11 @@ window.render=()=>{
     const mDp=!dep||r.dept===dep;
     return mS&&mD&&mDp;
   }).sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
-  // Sonuç sayısını güncelle
   const countEl=document.getElementById('qfResultCount');
-  if(countEl) countEl.textContent=filtered.length+' kayıt';
+  if(countEl)countEl.textContent=filtered.length+' kayıt';
   let html='';
   if(!filtered.length){
-    html=`<tr><td colspan="6"><div class="empty">
-      <div class="empty-icon">✦</div>
-      <div class="empty-title">Kayıt bulunamadı</div>
-      <div class="empty-text">Filtreleri değiştirin veya yeni bir talep oluşturun.</div>
-    </div></td></tr>`;
+    html=`<tr><td colspan="6"><div class="empty"><div class="empty-icon">✦</div><div class="empty-title">Kayıt bulunamadı</div><div class="empty-text">Filtreleri değiştirin veya yeni bir talep oluşturun.</div></div></td></tr>`;
   }else{
     filtered.forEach(r=>{
       const hasFiles=r.files&&r.files.length>0;
@@ -1286,24 +1188,15 @@ window.render=()=>{
       const SHORT=110;
       const isLong=desc.length>SHORT;
       const shortTxt=isLong?desc.slice(0,SHORT)+'…':desc;
-
-      // ── YETKİ KONTROLÜ ──────────────────────────────────────────────
-      // Düzenle: admin her zaman, standart/diğer sadece kendi talebi
       const canEdit=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
-      // Sil:    admin her zaman, standart/diğer sadece kendi talebi  ← DEĞİŞTİ
       const canDelete=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
-      // ────────────────────────────────────────────────────────────────
-
       html+=`<tr>
         <td><b>#${r.no}</b></td>
         <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--t2);">${r.date}<span class="time-chip">${r.time||''}</span></td>
         <td>${r.dept}</td>
         <td style="max-width:290px;">
           <div class="desc-cell-text">${esc(shortTxt)}</div>
-          ${isLong?`<button class="desc-read-more" onclick="openDescModal('${r.id}')">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Devamını Oku
-          </button>`:''}
+          ${isLong?`<button class="desc-read-more" onclick="openDescModal('${r.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Devamını Oku</button>`:''}
           ${hasFiles?`<span class="attach-chip" onclick="openFileModal('${r.id}')">📎 ${r.files.length} dosya</span>`:''}
         </td>
         <td style="color:var(--t2);font-size:12.5px;">${r.user}</td>
@@ -1330,6 +1223,7 @@ window.openFileModal=function(id){
 };
 window.closeFileModal=()=>document.getElementById('fileModal').style.display='none';
 
+/* ===== DEĞİŞİKLİK 4: saveRecord — doğru ID ile dosya yükleme ===== */
 window.saveRecord=async()=>{
   const existingId=document.getElementById("docId").value;
   const noVal=document.getElementById("no").value.trim();
@@ -1338,24 +1232,50 @@ window.saveRecord=async()=>{
   const noInp=document.getElementById('no');
   const noMsg=document.getElementById('noErrorMsg');
   const saveBtn=document.getElementById('saveBtn');
-  // Zorunlu alan kontrolü
   if(!noVal){noInp.classList.add('input-error');noInp.focus();showToast('⚠️','Talep No Boş','Talep numarası giriniz.');return;}
   if(!deptVal){showToast('⚠️','Departman Seçilmedi','Lütfen bir departman seçiniz.');return;}
   if(!descVal){const descInp=document.getElementById('desc');descInp.classList.add('input-error');descInp.focus();showToast('⚠️','Açıklama Boş','Lütfen talep açıklaması giriniz.');setTimeout(()=>descInp.classList.remove('input-error'),2500);return;}
   const duplicate=all.find(r=>String(r.no).trim()===noVal&&r.id!==existingId);
   if(duplicate){noInp.classList.add('input-error');noMsg.classList.add('visible');noInp.focus();return;}
   saveBtn.disabled=true;
+  saveBtn.textContent='Kaydediliyor...';
   try{
-    const targetId=existingId||('temp_'+Date.now());
-    const newFiles=await uploadFiles(targetId);
-    let files=newFiles;
-    if(existingId){const existing=all.find(x=>x.id===existingId);files=[...(existing?.files||[]),...newFiles];}
-    const data={no:noVal,date:document.getElementById("date").value,time:timeNow(),dept:document.getElementById("deptSelect").value,desc:document.getElementById("desc").value,user:me.email,files};
-    if(existingId){await updateDoc(doc(db,"records",existingId),data);}
-    else{await addDoc(collection(db,"records"),data);showToast('✅','Talep Oluşturuldu','Talep #'+noVal+' kaydedildi');}
-  }catch(e){alert("Kayıt sırasında hata: "+e.message);}
-  finally{resetForm();show('list');}
+    let recordId=existingId;
+    if(!existingId){
+      /* Önce Firestore'da kayıt oluştur → gerçek ID'yi al */
+      const docRef=await addDoc(collection(db,"records"),{
+        no:noVal,
+        date:document.getElementById("date").value,
+        time:timeNow(),
+        dept:deptVal,
+        desc:document.getElementById("desc").value,
+        user:me.email,
+        files:[]
+      });
+      recordId=docRef.id;
+    }
+    /* Gerçek ID ile dosyaları yükle */
+    const newFiles=await uploadFiles(recordId);
+    if(existingId){
+      const existing=all.find(x=>x.id===existingId);
+      const mergedFiles=[...(existing?.files||[]),...newFiles];
+      await updateDoc(doc(db,"records",existingId),{
+        no:noVal,date:document.getElementById("date").value,time:timeNow(),
+        dept:deptVal,desc:document.getElementById("desc").value,user:me.email,files:mergedFiles
+      });
+    }else{
+      if(newFiles.length){await updateDoc(doc(db,"records",recordId),{files:newFiles});}
+      showToast('✅','Talep Oluşturuldu','Talep #'+noVal+' kaydedildi');
+    }
+  }catch(e){
+    alert("Kayıt sırasında hata: "+e.message);
+  }finally{
+    resetForm();
+    show('list');
+  }
 };
+/* ================================================================= */
+
 window.deleteRecord=async id=>{
   if(!confirm("Kaydı Sil?"))return;
   const r=all.find(x=>x.id===id);
@@ -1371,6 +1291,7 @@ window.exportToExcel=()=>{
   XLSX.utils.book_append_sheet(wb,ws,"Talepler");
   XLSX.writeFile(wb,'Talep_Raporu_'+today()+'.xlsx');
 };
+
 window.show=id=>{
   if(id==='new'&&role==='gözlemci')return;
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active-section"));
@@ -1381,8 +1302,10 @@ window.show=id=>{
   if(id==='dashboard')renderDashboard();
   if(id==='takvim')renderTakvim();
 };
+
 window.addDept=async()=>{const n=document.getElementById("newDeptName").value;if(n)await addDoc(collection(db,"departments"),{name:n});document.getElementById("newDeptName").value="";};
 window.deleteDept=async id=>confirm("Sil?")&&await deleteDoc(doc(db,"departments",id));
+
 function showToast(icon,msg,sub){
   let t=document.getElementById('toast-notification');
   if(!t){t=document.createElement('div');t.id='toast-notification';t.innerHTML='<span class="toast-icon"></span><span class="toast-msg"></span><span class="toast-sub"></span>';document.body.appendChild(t);}
@@ -1393,28 +1316,27 @@ function showToast(icon,msg,sub){
   clearTimeout(t._timer);
   t._timer=setTimeout(()=>t.classList.remove('toast-show'),2800);
 }
+
 window.createNewUser=async()=>{
   const eEl=document.getElementById("newEmail"),pEl=document.getElementById("newPass"),rEl=document.getElementById("newRole");
   const e=eEl.value.trim(),p=pEl.value,r=rEl.value;
   if(!e||!p){alert("E-posta ve şifre zorunludur.");return;}
   try{
-    // Ayrı bir Firebase app instance aç — mevcut admin oturumunu hiç etkilemez
     const {initializeApp:_initApp}=await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
     const {getAuth:_getAuth,createUserWithEmailAndPassword:_createUser}=await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
     const secondaryApp=_initApp(cfg,"secondary_"+Date.now());
     const secondaryAuth=_getAuth(secondaryApp);
     const res=await _createUser(secondaryAuth,e,p);
     await setDoc(doc(db,"users",res.user.uid),{email:e,role:r});
-    // İkinci instance'ı hemen kapat
     await secondaryAuth.signOut();
     eEl.value='';pEl.value='';rEl.selectedIndex=0;
     showToast('✅','Kullanıcı Oluşturuldu',e+' · '+r);
-  }catch(err){
-    alert("Hata: "+err.message);
-  }
+  }catch(err){alert("Hata: "+err.message);}
 };
+
 window.deleteUser=async id=>confirm("Kullanıcıyı Sil?")&&await deleteDoc(doc(db,"users",id));
 window.logout=()=>signOut(auth);
+
 window.openUserModal=(uid,email,role)=>{
   document.getElementById("editUid").value=uid;
   document.getElementById("editEmail").value=email;
