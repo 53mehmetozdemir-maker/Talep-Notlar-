@@ -408,8 +408,8 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
   <div class="login-logo">T</div>
   <h1>Talep<br>Notları</h1>
   <span class="login-sub">Kurumsal talep yönetimi // v4.1</span>
-  <input id="luser" placeholder="E-posta adresiniz">
-  <input id="lpass" type="password" placeholder="Şifreniz">
+  <input id="luser" placeholder="E-posta adresiniz" onkeydown="if(event.key==='Enter')document.getElementById('lpass').focus()">
+  <input id="lpass" type="password" placeholder="Şifreniz" onkeydown="if(event.key==='Enter')login()">
   <button class="btn-primary" onclick="login()">Giriş Yap →</button>
 </div>
 
@@ -1287,9 +1287,12 @@ window.render=()=>{
       const isLong=desc.length>SHORT;
       const shortTxt=isLong?desc.slice(0,SHORT)+'…':desc;
 
-      // Düzenle butonu: admin her zaman görür, diğerleri sadece kendi talebi
+      // ── YETKİ KONTROLÜ ──────────────────────────────────────────────
+      // Düzenle: admin her zaman, standart/diğer sadece kendi talebi
       const canEdit=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
+      // Sil:    admin her zaman, standart/diğer sadece kendi talebi  ← DEĞİŞTİ
       const canDelete=(role==='admin')||(role!=='gözlemci'&&r.user===me.email);
+      // ────────────────────────────────────────────────────────────────
 
       html+=`<tr>
         <td><b>#${r.no}</b></td>
@@ -1330,9 +1333,15 @@ window.closeFileModal=()=>document.getElementById('fileModal').style.display='no
 window.saveRecord=async()=>{
   const existingId=document.getElementById("docId").value;
   const noVal=document.getElementById("no").value.trim();
+  const descVal=document.getElementById("desc").value.trim();
+  const deptVal=document.getElementById("deptSelect").value;
   const noInp=document.getElementById('no');
   const noMsg=document.getElementById('noErrorMsg');
   const saveBtn=document.getElementById('saveBtn');
+  // Zorunlu alan kontrolü
+  if(!noVal){noInp.classList.add('input-error');noInp.focus();showToast('⚠️','Talep No Boş','Talep numarası giriniz.');return;}
+  if(!deptVal){showToast('⚠️','Departman Seçilmedi','Lütfen bir departman seçiniz.');return;}
+  if(!descVal){const descInp=document.getElementById('desc');descInp.classList.add('input-error');descInp.focus();showToast('⚠️','Açıklama Boş','Lütfen talep açıklaması giriniz.');setTimeout(()=>descInp.classList.remove('input-error'),2500);return;}
   const duplicate=all.find(r=>String(r.no).trim()===noVal&&r.id!==existingId);
   if(duplicate){noInp.classList.add('input-error');noMsg.classList.add('visible');noInp.focus();return;}
   saveBtn.disabled=true;
