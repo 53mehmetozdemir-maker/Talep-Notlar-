@@ -556,7 +556,8 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
           <div class="divider"><span>bilgiler</span></div>
           <input id="resolvedDocId" type="hidden">
           <label>Talep No</label>
-          <input id="resolvedNo" placeholder="İlgili talep numarası">
+          <input id="resolvedNo" placeholder="İlgili talep numarası" oninput="clearResolvedNoError()">
+          <div class="field-error-msg" id="resolvedNoErrorMsg">⚠ Bu talep numarası için zaten bir çözüm kaydı mevcut.</div>
           <label style="margin-top:14px;">Tarih</label>
           <input id="resolvedDate" type="date">
           <label style="margin-top:14px;">Çözüm Açıklaması</label>
@@ -567,8 +568,9 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       </div>
 
       <div class="panel panel-clip" style="margin-bottom:16px;">
-        <div class="filter-row" style="grid-template-columns:1.5fr 1fr auto;">
+        <div class="filter-row" style="grid-template-columns:1.3fr 1fr 1fr auto;">
           <div><label>Arama</label><input id="resolvedSearch" placeholder="Talep no veya açıklama..." oninput="renderResolved()"></div>
+          <div><label>Oluşturan</label><select id="resolvedFilterUser" onchange="renderResolved()"><option value="">Tüm Kullanıcılar</option></select></div>
           <div><label>Tarih</label><input type="date" id="resolvedFilterDate" onchange="renderResolved()"></div>
           <div style="padding-bottom:0;">
             <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);display:block;padding:10px 0;" id="resolvedResultCount">— kayıt</span>
@@ -1340,6 +1342,7 @@ function resetResolvedForm(){
   document.getElementById('resolvedSaveBtn').textContent='Çözümü Kaydet →';
   document.getElementById('resolvedSaveBtn').disabled=false;
   document.getElementById('resolvedCancelBtn').style.display='none';
+  clearResolvedNoError();
 }
 window.resetResolvedForm=resetResolvedForm;
 
@@ -1348,11 +1351,22 @@ function renderResolved(){
   if(!tbEl||!me)return;
   const s=(document.getElementById('resolvedSearch')?.value||'').toLowerCase();
   const fd=document.getElementById('resolvedFilterDate')?.value||'';
+  const fu=document.getElementById('resolvedFilterUser')?.value||'';
   const base=role==='admin'?resolvedAll:resolvedAll.filter(r=>r.user===me.email);
+
+  const userSel=document.getElementById('resolvedFilterUser');
+  if(userSel){
+    const curSel=userSel.value;
+    const users=[...new Set(base.map(r=>r.user).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    userSel.innerHTML='<option value="">Tüm Kullanıcılar</option>'+users.map(u=>`<option value="${u}">${u}</option>`).join('');
+    if(users.includes(curSel))userSel.value=curSel;
+  }
+
   resolvedFiltered=base.filter(r=>{
     const mS=String(r.no||'').toLowerCase().includes(s)||(r.desc||'').toLowerCase().includes(s);
     const mD=!fd||r.date===fd;
-    return mS&&mD;
+    const mU=!fu||r.user===fu;
+    return mS&&mD&&mU;
   }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const countEl=document.getElementById('resolvedResultCount');
   if(countEl)countEl.textContent=resolvedFiltered.length+' kayıt';
@@ -1378,14 +1392,28 @@ function renderResolved(){
 }
 window.renderResolved=renderResolved;
 
+window.clearResolvedNoError=function(){
+  document.getElementById('resolvedNo').classList.remove('input-error');
+  document.getElementById('resolvedNoErrorMsg').classList.remove('visible');
+};
+
 window.saveResolved=async function(){
   const existingId=document.getElementById('resolvedDocId').value;
   const noVal=document.getElementById('resolvedNo').value.trim();
   const dateVal=document.getElementById('resolvedDate').value;
   const descVal=document.getElementById('resolvedDesc').value.trim();
   const btn=document.getElementById('resolvedSaveBtn');
+  const noInp=document.getElementById('resolvedNo');
+  const noMsg=document.getElementById('resolvedNoErrorMsg');
   if(!noVal){showToast('⚠️','Talep No Boş','Lütfen ilgili talep numarasını giriniz.');return;}
   if(!descVal){showToast('⚠️','Açıklama Boş','Lütfen çözüm açıklaması giriniz.');return;}
+  const duplicate=resolvedAll.find(r=>String(r.no).trim()===noVal&&r.id!==existingId);
+  if(duplicate){
+    noInp.classList.add('input-error');
+    noMsg.classList.add('visible');
+    noInp.focus();
+    return;
+  }
   btn.disabled=true;btn.textContent='Kaydediliyor...';
   try{
     if(existingId){
@@ -1422,6 +1450,7 @@ window.openEditResolved=function(id){
   document.getElementById('resolvedFormTitle').textContent='Çözüm Kaydını Düzenle';
   document.getElementById('resolvedSaveBtn').textContent='Değişiklikleri Kaydet →';
   document.getElementById('resolvedCancelBtn').style.display='flex';
+  clearResolvedNoError();
   window.scrollTo({top:0,behavior:'smooth'});
   document.getElementById('resolvedNo').focus();
 };
