@@ -403,6 +403,7 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
     <button id="nav-takvim" onclick="show('takvim')">Dağıtım Takvimi</button>
     <button id="nav-dashboard" onclick="show('dashboard')">Dashboard</button>
     <button id="nav-list" class="active" onclick="show('list')">Talepler</button>
+    <button id="nav-resolved" onclick="show('resolved')">Çözülen Talepler</button>
     <button id="nav-new" onclick="show('new')">Yeni Talep</button>
     <button id="nav-admin" style="display:none;" onclick="show('admin')">Yönetim</button>
     <button class="theme-btn" onclick="toggleTheme()">
@@ -541,6 +542,52 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       </div>
     </div>
 
+    <!-- RESOLVED (ÇÖZÜLEN TALEPLER) -->
+    <div id="resolved" class="section">
+      <div class="page-hdr">
+        <h2>Çözülen <em>Talepler</em></h2>
+        <p id="resolvedPageDesc">Çözdüğünüz talepleri buradan kayıt altına alın</p>
+      </div>
+
+      <div class="form-wrap" style="max-width:660px;margin:0 auto 24px;">
+        <div class="panel panel-clip form-panel" id="resolvedFormPanel">
+          <h3 id="resolvedFormTitle">Çözüm Kaydı</h3>
+          <span class="form-sub">İlgili talebin çözüm bilgilerini girin</span>
+          <div class="divider"><span>bilgiler</span></div>
+          <input id="resolvedDocId" type="hidden">
+          <label>Talep No</label>
+          <input id="resolvedNo" placeholder="İlgili talep numarası">
+          <label style="margin-top:14px;">Tarih</label>
+          <input id="resolvedDate" type="date">
+          <label style="margin-top:14px;">Çözüm Açıklaması</label>
+          <textarea id="resolvedDesc" rows="5" placeholder="Talebin nasıl çözüldüğünü yazın..."></textarea>
+          <button class="btn-primary" id="resolvedSaveBtn" onclick="saveResolved()">Çözümü Kaydet →</button>
+          <button class="btn-cancel" id="resolvedCancelBtn" style="display:none;" onclick="resetResolvedForm()">Düzenlemeyi İptal Et</button>
+        </div>
+      </div>
+
+      <div class="panel panel-clip" style="margin-bottom:16px;">
+        <div class="filter-row" style="grid-template-columns:1.5fr 1fr auto;">
+          <div><label>Arama</label><input id="resolvedSearch" placeholder="Talep no veya açıklama..." oninput="renderResolved()"></div>
+          <div><label>Tarih</label><input type="date" id="resolvedFilterDate" onchange="renderResolved()"></div>
+          <div style="padding-bottom:0;">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);display:block;padding:10px 0;" id="resolvedResultCount">— kayıt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th><th>Tarih</th><th>Çözüm Açıklaması</th><th>Kaydeden</th><th style="text-align:right;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="resolvedTb"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- NEW -->
     <div id="new" class="section">
       <div class="page-hdr">
@@ -675,6 +722,7 @@ let personnelData=[];
 let assignments=[];
 let distViewYear=new Date().getFullYear();
 let distViewMonth=new Date().getMonth();
+let resolvedAll=[],resolvedFiltered=[];
 
 const today=()=>new Date().toISOString().split('T')[0];
 const timeNow=()=>new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
@@ -908,7 +956,10 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById("panel").style.display="block";
     document.getElementById("nav-admin").style.display=role==="admin"?"inline-flex":"none";
     document.getElementById("nav-new").style.display=role==="gözlemci"?"none":"inline-flex";
+    document.getElementById("resolvedFormPanel").style.display=role==="gözlemci"?"none":"block";
+    document.getElementById("resolvedPageDesc").textContent=role==="admin"?"Tüm kullanıcıların çözüm kayıtlarını görüntülüyorsunuz":"Çözdüğünüz talepleri buradan kayıt altına alın";
     document.getElementById("date").value=today();
+    document.getElementById("resolvedDate").value=today();
     document.getElementById("filterStart").value='';
     document.getElementById("filterEnd").value='';
     document.getElementById("assignDate").value=today();
@@ -973,6 +1024,10 @@ function init(){
     snap.forEach(d=>assignments.push({id:d.id,...d.data()}));
     renderTakvim();
     renderAssignList();
+  });
+  onSnapshot(collection(db,"resolvedRecords"),snap=>{
+    resolvedAll=[];snap.forEach(d=>resolvedAll.push({id:d.id,...d.data()}));
+    renderResolved();
   });
   if(role==="admin"){
     onSnapshot(collection(db,"users"),snap=>{
@@ -1274,6 +1329,115 @@ window.deleteRecord=async id=>{
   await deleteDoc(doc(db,"records",id));
 };
 
+/* ===================== ÇÖZÜLEN TALEPLER ===================== */
+
+function resetResolvedForm(){
+  document.getElementById('resolvedDocId').value='';
+  document.getElementById('resolvedNo').value='';
+  document.getElementById('resolvedDate').value=today();
+  document.getElementById('resolvedDesc').value='';
+  document.getElementById('resolvedFormTitle').textContent='Çözüm Kaydı';
+  document.getElementById('resolvedSaveBtn').textContent='Çözümü Kaydet →';
+  document.getElementById('resolvedSaveBtn').disabled=false;
+  document.getElementById('resolvedCancelBtn').style.display='none';
+}
+window.resetResolvedForm=resetResolvedForm;
+
+function renderResolved(){
+  const tbEl=document.getElementById('resolvedTb');
+  if(!tbEl||!me)return;
+  const s=(document.getElementById('resolvedSearch')?.value||'').toLowerCase();
+  const fd=document.getElementById('resolvedFilterDate')?.value||'';
+  const base=role==='admin'?resolvedAll:resolvedAll.filter(r=>r.user===me.email);
+  resolvedFiltered=base.filter(r=>{
+    const mS=String(r.no||'').toLowerCase().includes(s)||(r.desc||'').toLowerCase().includes(s);
+    const mD=!fd||r.date===fd;
+    return mS&&mD;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const countEl=document.getElementById('resolvedResultCount');
+  if(countEl)countEl.textContent=resolvedFiltered.length+' kayıt';
+  let html='';
+  if(!resolvedFiltered.length){
+    html=`<tr><td colspan="5"><div class="empty"><div class="empty-icon">✓</div><div class="empty-title">Kayıt bulunamadı</div><div class="empty-text">Henüz çözülen talep kaydı yok.</div></div></td></tr>`;
+  }else{
+    resolvedFiltered.forEach(r=>{
+      const canManage=(role==='admin')||(r.user===me.email);
+      html+=`<tr>
+        <td><b>#${r.no}</b></td>
+        <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--t2);">${r.date||''}</td>
+        <td style="max-width:340px;"><div class="desc-cell-text">${esc(r.desc||'')}</div></td>
+        <td style="color:var(--t2);font-size:12.5px;">${r.user||''}</td>
+        <td style="text-align:right;white-space:nowrap;">
+          ${canManage?`<button class="act act-edit" onclick="openEditResolved('${r.id}')">✏ Düzenle</button>`:''}
+          ${canManage?`<button class="act act-del" onclick="deleteResolved('${r.id}')">🗑 Sil</button>`:''}
+        </td>
+      </tr>`;
+    });
+  }
+  tbEl.innerHTML=html;
+}
+window.renderResolved=renderResolved;
+
+window.saveResolved=async function(){
+  const existingId=document.getElementById('resolvedDocId').value;
+  const noVal=document.getElementById('resolvedNo').value.trim();
+  const dateVal=document.getElementById('resolvedDate').value;
+  const descVal=document.getElementById('resolvedDesc').value.trim();
+  const btn=document.getElementById('resolvedSaveBtn');
+  if(!noVal){showToast('⚠️','Talep No Boş','Lütfen ilgili talep numarasını giriniz.');return;}
+  if(!descVal){showToast('⚠️','Açıklama Boş','Lütfen çözüm açıklaması giriniz.');return;}
+  btn.disabled=true;btn.textContent='Kaydediliyor...';
+  try{
+    if(existingId){
+      const existing=resolvedAll.find(x=>x.id===existingId);
+      if(existing&&role!=='admin'&&existing.user!==me.email){
+        alert('Bu kaydı sadece kaydı oluşturan kişi düzenleyebilir.');
+        return;
+      }
+      await updateDoc(doc(db,'resolvedRecords',existingId),{no:noVal,date:dateVal,desc:descVal});
+      showToast('✅','Güncellendi','Talep #'+noVal+' çözüm kaydı güncellendi');
+    }else{
+      await addDoc(collection(db,'resolvedRecords'),{no:noVal,date:dateVal,desc:descVal,user:me.email,createdAt:new Date().toISOString()});
+      showToast('✅','Çözüm Kaydedildi','Talep #'+noVal+' çözüm kaydı eklendi');
+    }
+    resetResolvedForm();
+  }catch(e){
+    alert('Kayıt sırasında hata: '+e.message);
+  }finally{
+    btn.disabled=false;
+  }
+};
+
+window.openEditResolved=function(id){
+  const r=resolvedAll.find(x=>x.id===id);
+  if(!r)return;
+  if(role!=='admin'&&r.user!==me.email){
+    alert('Bu kaydı sadece kaydı oluşturan kişi ('+r.user+') düzenleyebilir.');
+    return;
+  }
+  document.getElementById('resolvedDocId').value=r.id;
+  document.getElementById('resolvedNo').value=r.no;
+  document.getElementById('resolvedDate').value=r.date||today();
+  document.getElementById('resolvedDesc').value=r.desc||'';
+  document.getElementById('resolvedFormTitle').textContent='Çözüm Kaydını Düzenle';
+  document.getElementById('resolvedSaveBtn').textContent='Değişiklikleri Kaydet →';
+  document.getElementById('resolvedCancelBtn').style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('resolvedNo').focus();
+};
+
+window.deleteResolved=async function(id){
+  const r=resolvedAll.find(x=>x.id===id);
+  if(r&&role!=='admin'&&r.user!==me.email){
+    alert('Bu kaydı sadece kaydı oluşturan kişi silebilir.');
+    return;
+  }
+  if(!confirm('Çözüm kaydını sil?'))return;
+  await deleteDoc(doc(db,'resolvedRecords',id));
+};
+
+/* =============================================================== */
+
 window.exportToExcel=()=>{
   if(!filtered.length)return alert("İndirilecek veri bulunamadı!");
 
@@ -1326,6 +1490,8 @@ window.show=id=>{
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
   const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('active');
   if(id==='new'&&!document.getElementById("docId").value)resetForm();
+  if(id==='resolved'&&!document.getElementById("resolvedDocId").value)resetResolvedForm();
+  if(id==='resolved')renderResolved();
   if(id==='dashboard')renderDashboard();
   if(id==='takvim')renderTakvim();
 };
