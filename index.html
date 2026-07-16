@@ -462,6 +462,53 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
         <div class="spark-row" id="sparkRow"></div>
         <div class="spark-labels" id="sparkLabels"></div>
       </div>
+
+      <!-- ÇÖZÜLEN TALEPLER ANALİZİ -->
+      <div class="page-hdr" style="margin-top:36px;margin-bottom:20px;">
+        <h2 style="font-size:1.9rem;">Çözülen <em>Talepler Analizi</em></h2>
+        <p>Çözüm performansı, kullanıcı bazlı dağılım ve son çözümler</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Toplam Çözülen</div>
+          <div class="stat-card-value" id="statResolvedTotal">—</div>
+          <div class="stat-card-sub">Tüm zamanlar</div>
+          <div class="stat-card-accent" style="background:var(--ok);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Bugün Çözülen</div>
+          <div class="stat-card-value" id="statResolvedToday">—</div>
+          <div class="stat-card-sub" id="statResolvedTodayDate">—</div>
+          <div class="stat-card-accent" style="background:var(--hi3);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Bu Hafta Çözülen</div>
+          <div class="stat-card-value" id="statResolvedWeek">—</div>
+          <div class="stat-card-sub">Son 7 gün</div>
+          <div class="stat-card-accent" style="background:var(--hi2);"></div>
+        </div>
+        <div class="stat-card panel-clip">
+          <div class="stat-card-label">Çözüm Oranı</div>
+          <div class="stat-card-value" id="statResolveRate">—</div>
+          <div class="stat-card-sub">Toplam talebe oran</div>
+          <div class="stat-card-accent" style="background:var(--hi4);"></div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel panel-clip chart-panel">
+          <h3>🏆 Kullanıcı Bazlı Çözüm Performansı</h3>
+          <div class="bar-chart" id="resolverChart"></div>
+        </div>
+        <div class="panel panel-clip recent-panel">
+          <h3>✅ Son Çözülen Talepler</h3>
+          <div id="recentResolvedList"></div>
+        </div>
+      </div>
+      <div class="panel" style="padding:24px 26px;margin-top:16px;">
+        <h3 style="font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--t2);margin-bottom:14px;">📈 Son 7 Günlük Çözüm Aktivitesi</h3>
+        <div class="spark-row" id="resolvedSparkRow"></div>
+        <div class="spark-labels" id="resolvedSparkLabels"></div>
+      </div>
     </div>
 
     <!-- TAKVİM -->
@@ -568,13 +615,20 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
       </div>
 
       <div class="panel panel-clip" style="margin-bottom:16px;">
-        <div class="filter-row" style="grid-template-columns:1.3fr 1fr 1fr auto;">
+        <div class="quick-filter-bar">
+          <span class="quick-filter-label">⚡ Hızlı Filtre</span>
+          <button class="qf-btn" id="rqf-today" onclick="setResolvedQuickFilter('today')">Bugün</button>
+          <button class="qf-btn" id="rqf-week" onclick="setResolvedQuickFilter('week')">Son 1 Hafta</button>
+          <button class="qf-btn" id="rqf-month" onclick="setResolvedQuickFilter('month')">Son 1 Ay</button>
+          <button class="qf-btn qf-active" id="rqf-all" onclick="setResolvedQuickFilter('all')">Tüm Zamanlar</button>
+          <div class="qf-divider"></div>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);" id="resolvedResultCount">— kayıt</span>
+        </div>
+        <div class="filter-row" style="grid-template-columns:1.3fr 1fr 1fr 1fr;">
           <div><label>Arama</label><input id="resolvedSearch" placeholder="Talep no veya açıklama..." oninput="renderResolved()"></div>
           <div><label>Oluşturan</label><select id="resolvedFilterUser" onchange="renderResolved()"><option value="">Tüm Kullanıcılar</option></select></div>
-          <div><label>Tarih</label><input type="date" id="resolvedFilterDate" onchange="renderResolved()"></div>
-          <div style="padding-bottom:0;">
-            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);display:block;padding:10px 0;" id="resolvedResultCount">— kayıt</span>
-          </div>
+          <div><label>Başlangıç</label><input type="date" id="resolvedFilterStart" onchange="clearResolvedQuickFilter();renderResolved()"></div>
+          <div><label>Bitiş</label><input type="date" id="resolvedFilterEnd" onchange="clearResolvedQuickFilter();renderResolved()"></div>
         </div>
       </div>
 
@@ -964,6 +1018,8 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById("resolvedDate").value=today();
     document.getElementById("filterStart").value='';
     document.getElementById("filterEnd").value='';
+    document.getElementById("resolvedFilterStart").value='';
+    document.getElementById("resolvedFilterEnd").value='';
     document.getElementById("assignDate").value=today();
     init();
 
@@ -1029,7 +1085,7 @@ function init(){
   });
   onSnapshot(collection(db,"resolvedRecords"),snap=>{
     resolvedAll=[];snap.forEach(d=>resolvedAll.push({id:d.id,...d.data()}));
-    renderResolved();
+    renderResolved();renderDashboard();
   });
   if(role==="admin"){
     onSnapshot(collection(db,"users"),snap=>{
@@ -1197,6 +1253,47 @@ function renderDashboard(){
     sparkEl.innerHTML=counts.map(c=>`<div class="spark-bar" style="height:${Math.max(4,Math.round(c/maxC*48))}px;" title="${c} talep"></div>`).join('');
     labelEl.innerHTML=days.map(d=>`<span class="spark-label">${new Date(d+'T12:00:00').toLocaleDateString('tr-TR',{weekday:'short'})}</span>`).join('');
   }
+
+  /* ===== ÇÖZÜLEN TALEPLER ANALİZİ ===== */
+  const resolvedTotalEl=document.getElementById('statResolvedTotal');
+  if(resolvedTotalEl){
+    const rToday=resolvedAll.filter(r=>r.date===t).length;
+    const rWeek=resolvedAll.filter(r=>r.date&&new Date(r.date)>=weekAgo).length;
+    const rate=all.length?Math.round(resolvedAll.length/all.length*100):0;
+    resolvedTotalEl.textContent=resolvedAll.length;
+    document.getElementById('statResolvedToday').textContent=rToday;
+    document.getElementById('statResolvedTodayDate').textContent=new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
+    document.getElementById('statResolvedWeek').textContent=rWeek;
+    document.getElementById('statResolveRate').textContent=rate+'%';
+
+    const resolverCounts={};
+    resolvedAll.forEach(r=>{if(r.user)resolverCounts[r.user]=(resolverCounts[r.user]||0)+1;});
+    const rSorted=Object.entries(resolverCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const rMax=rSorted.length?rSorted[0][1]:1;
+    const resolverChartEl=document.getElementById('resolverChart');
+    if(resolverChartEl){
+      if(!rSorted.length){resolverChartEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz çözüm kaydı yok.</div>';}
+      else{resolverChartEl.innerHTML=rSorted.map(([user,count])=>`<div class="bar-row"><span class="bar-label" title="${user}">${user}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/rMax*100)}%;background:var(--ok);"></div></div><span class="bar-val" style="color:var(--ok);">${count}</span></div>`).join('');}
+    }
+
+    const recentResolvedEl=document.getElementById('recentResolvedList');
+    if(recentResolvedEl){
+      const recentR=[...resolvedAll].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
+      if(!recentR.length){recentResolvedEl.innerHTML='<div style="color:var(--t3);font-size:13px;padding:20px 0;">Henüz çözülen talep yok.</div>';}
+      else{recentResolvedEl.innerHTML=recentR.map(r=>`<div class="recent-item"><span class="recent-no" style="color:var(--ok);background:var(--ok-bg);border-color:var(--ok-bd);">#${r.no}</span><div class="recent-info"><div class="recent-dept">${r.user||'—'}</div><div class="recent-desc">${r.desc||'—'}</div></div><span class="recent-time">${r.date||''}</span></div>`).join('');}
+    }
+
+    const rSparkEl=document.getElementById('resolvedSparkRow');
+    const rLabelEl=document.getElementById('resolvedSparkLabels');
+    if(rSparkEl&&rLabelEl){
+      const days2=[];
+      for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days2.push(d.toISOString().split('T')[0]);}
+      const counts2=days2.map(d=>resolvedAll.filter(r=>r.date===d).length);
+      const maxC2=Math.max(...counts2,1);
+      rSparkEl.innerHTML=counts2.map(c=>`<div class="spark-bar" style="height:${Math.max(4,Math.round(c/maxC2*48))}px;background:var(--ok);" title="${c} çözüm"></div>`).join('');
+      rLabelEl.innerHTML=days2.map(d=>`<span class="spark-label">${new Date(d+'T12:00:00').toLocaleDateString('tr-TR',{weekday:'short'})}</span>`).join('');
+    }
+  }
 }
 
 let activeQuickFilter='all';
@@ -1215,6 +1312,24 @@ window.setQuickFilter=function(mode){
   else if(mode==='month'){const d=new Date();d.setDate(d.getDate()-30);document.getElementById('filterStart').value=d.toISOString().split('T')[0];document.getElementById('filterEnd').value=todayStr;}
   else{document.getElementById('filterStart').value='';document.getElementById('filterEnd').value='';}
   render();
+};
+
+let activeResolvedQuickFilter='all';
+
+window.clearResolvedQuickFilter=function(){
+  activeResolvedQuickFilter='custom';
+  ['today','week','month','all'].forEach(m=>{const btn=document.getElementById('rqf-'+m);if(btn)btn.classList.remove('qf-active');});
+};
+
+window.setResolvedQuickFilter=function(mode){
+  activeResolvedQuickFilter=mode;
+  ['today','week','month','all'].forEach(m=>{const btn=document.getElementById('rqf-'+m);if(btn)btn.classList.toggle('qf-active',m===mode);});
+  const todayStr=today();
+  if(mode==='today'){document.getElementById('resolvedFilterStart').value=todayStr;document.getElementById('resolvedFilterEnd').value=todayStr;}
+  else if(mode==='week'){const d=new Date();d.setDate(d.getDate()-7);document.getElementById('resolvedFilterStart').value=d.toISOString().split('T')[0];document.getElementById('resolvedFilterEnd').value=todayStr;}
+  else if(mode==='month'){const d=new Date();d.setDate(d.getDate()-30);document.getElementById('resolvedFilterStart').value=d.toISOString().split('T')[0];document.getElementById('resolvedFilterEnd').value=todayStr;}
+  else{document.getElementById('resolvedFilterStart').value='';document.getElementById('resolvedFilterEnd').value='';}
+  renderResolved();
 };
 
 window.render=()=>{
@@ -1350,7 +1465,8 @@ function renderResolved(){
   const tbEl=document.getElementById('resolvedTb');
   if(!tbEl||!me)return;
   const s=(document.getElementById('resolvedSearch')?.value||'').toLowerCase();
-  const fd=document.getElementById('resolvedFilterDate')?.value||'';
+  const fs=document.getElementById('resolvedFilterStart')?.value||'';
+  const fe=document.getElementById('resolvedFilterEnd')?.value||'';
   const fu=document.getElementById('resolvedFilterUser')?.value||'';
   const base=role==='admin'?resolvedAll:resolvedAll.filter(r=>r.user===me.email);
 
@@ -1364,7 +1480,7 @@ function renderResolved(){
 
   resolvedFiltered=base.filter(r=>{
     const mS=String(r.no||'').toLowerCase().includes(s)||(r.desc||'').toLowerCase().includes(s);
-    const mD=!fd||r.date===fd;
+    const mD=(!fs||(r.date||'')>=fs)&&(!fe||(r.date||'')<=fe);
     const mU=!fu||r.user===fu;
     return mS&&mD&&mU;
   }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
