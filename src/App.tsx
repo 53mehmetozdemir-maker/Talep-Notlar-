@@ -1,28 +1,44 @@
-import { useEffect, useState } from 'react';
-import { auth } from './lib/firebase';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { useAuth } from './context/auth-context';
+import { canCreate, isAdmin } from './lib/roles';
+import { LoginScreen } from './components/LoginScreen';
+import { Navbar } from './components/Navbar';
+import { PlaceholderPage } from './components/PlaceholderPage';
+import { RequireRole } from './components/RequireRole';
 
-function App() {
-  const [theme, setTheme] = useState(localStorage.getItem('talep-theme') || 'dark');
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('talep-theme', theme);
-  }, [theme]);
-
+function Shell() {
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Talep <em>Notları</em></h1>
-      <p style={{ color: 'var(--t2)', marginTop: 8 }}>
-        Firebase bağlandı: {auth.app.options.projectId}
-      </p>
-      <button
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        style={{ marginTop: 20, padding: '10px 18px', background: 'var(--hi)', color: 'var(--c0)', border: 'none', fontWeight: 700, cursor: 'pointer' }}
-      >
-        Temayı Değiştir
-      </button>
-    </div>
+    <>
+      <Navbar />
+      <div className="wrap">
+        <Outlet />
+      </div>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return <LoginScreen />;
+
+  return (
+    <Routes>
+      <Route element={<Shell />}>
+        <Route index element={<Navigate to="/talepler" replace />} />
+        <Route path="takvim" element={<PlaceholderPage title="Talep" accent="Dağıtım Takvimi" description="Personel görev planlaması ve aylık dağıtım görünümü" />} />
+        <Route path="dashboard" element={<PlaceholderPage title="Genel" accent="Bakış" description="Anlık istatistikler ve departman dağılımı" />} />
+        <Route path="talepler" element={<PlaceholderPage title="Tüm" accent="Talepler" description="Filtreleyin · Arayın · Dışa aktarın" />} />
+        <Route path="cozulenler" element={<PlaceholderPage title="Çözülen" accent="Talepler" description="Çözdüğünüz talepleri buradan kayıt altına alın" />} />
+        <Route element={<RequireRole allow={canCreate} />}>
+          <Route path="yeni" element={<PlaceholderPage title="Yeni" accent="Kayıt" description="Yeni talep oluştur" />} />
+        </Route>
+        <Route element={<RequireRole allow={isAdmin} />}>
+          <Route path="yonetim" element={<PlaceholderPage title="Sistem" accent="Yönetimi" description="Departman · Kullanıcı · Yetki · Dağıtım Takvimi" />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/talepler" replace />} />
+      </Route>
+    </Routes>
+  );
+}
