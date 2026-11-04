@@ -5,6 +5,7 @@ import { LoginScreen } from './components/LoginScreen';
 import { Navbar } from './components/Navbar';
 import { PlaceholderPage } from './components/PlaceholderPage';
 import { RequireRole } from './components/RequireRole';
+import { RecordsPage } from './features/records/RecordsPage';
 
 function Shell() {
   return (
@@ -29,7 +30,7 @@ export default function App() {
         <Route index element={<Navigate to="/talepler" replace />} />
         <Route path="takvim" element={<PlaceholderPage title="Talep" accent="Dağıtım Takvimi" description="Personel görev planlaması ve aylık dağıtım görünümü" />} />
         <Route path="dashboard" element={<PlaceholderPage title="Genel" accent="Bakış" description="Anlık istatistikler ve departman dağılımı" />} />
-        <Route path="talepler" element={<PlaceholderPage title="Tüm" accent="Talepler" description="Filtreleyin · Arayın · Dışa aktarın" />} />
+        <Route path="talepler" element={<RecordsPage />} />
         <Route path="cozulenler" element={<PlaceholderPage title="Çözülen" accent="Talepler" description="Çözdüğünüz talepleri buradan kayıt altına alın" />} />
         <Route element={<RequireRole allow={canCreate} />}>
           <Route path="yeni" element={<PlaceholderPage title="Yeni" accent="Kayıt" description="Yeni talep oluştur" />} />
