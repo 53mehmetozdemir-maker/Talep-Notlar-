@@ -1,107 +1,128 @@
-:root { --pl-accent: #a8d900; --pl-accent-soft: rgba(168, 217, 0, 0.18); --pl-radius: 10px; }
+::selection { background: var(--hi); color: var(--c0); }
 
-/* ---- Odak halkası ---- */
-html body input:focus,
-html body select:focus,
-html body textarea:focus {
-  outline: none;
-  border-color: var(--pl-accent);
-  box-shadow: 0 0 0 3px var(--pl-accent-soft);
-  transition: box-shadow .15s ease, border-color .15s ease;
-}
-html body input, html body select, html body textarea {
-  transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
-}
-html body :focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
+/* ---- Menü ---- */
+nav button.active, nav a.active { box-shadow: inset 0 -2px 0 var(--hi); }
 
-/* ---- Düğmeler ---- */
-html body .btn-primary,
-html body .btn-cancel,
-html body .act {
-  transition: transform .12s ease, filter .15s ease, box-shadow .15s ease, background-color .15s ease;
+/* ---- Sayfa başlığı ---- */
+.page-hdr::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 16px;
+  background: var(--hi);
+  box-shadow: 14px 0 0 var(--hi2);
 }
-html body .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow: 0 6px 22px var(--pl-accent-soft);
-  transform: translateY(-1px);
-}
-html body .btn-primary:active:not(:disabled),
-html body .act:active:not(:disabled) { transform: translateY(0) scale(.98); }
-html body .btn-cancel:hover:not(:disabled) { filter: brightness(1.25); }
-html body .act:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
-html body button:disabled { cursor: not-allowed; opacity: .55; }
+
+/* ---- Paneller ---- */
+.panel:hover { border-color: var(--bd); }
+
+/* ---- Hızlı filtre ---- */
+.qf-btn.qf-active { box-shadow: 0 0 0 2px var(--bd); }
 
 /* ---- Tablo ---- */
-html body table tbody tr { transition: background-color .15s ease, box-shadow .15s ease; }
-html body table tbody tr:hover {
-  background-color: var(--pl-accent-soft);
-  box-shadow: inset 3px 0 0 var(--pl-accent);
-}
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--c2) 45%, transparent); }
+tbody tr:hover td { background: var(--hib); }
+tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--hi); }
+tbody tr { animation: pl-row .35s var(--ease) both; }
+tbody tr:nth-child(1) { animation-delay: .00s; }
+tbody tr:nth-child(2) { animation-delay: .04s; }
+tbody tr:nth-child(3) { animation-delay: .08s; }
+tbody tr:nth-child(4) { animation-delay: .12s; }
+tbody tr:nth-child(5) { animation-delay: .16s; }
+tbody tr:nth-child(6) { animation-delay: .20s; }
+tbody tr:nth-child(7) { animation-delay: .24s; }
+tbody tr:nth-child(8) { animation-delay: .28s; }
+tbody tr:nth-child(n+9) { animation-delay: .32s; }
 
-/* ---- Modal içi ---- */
-html body .ef-row { transition: background-color .15s ease, transform .15s ease; border-radius: 8px; }
-html body .ef-row:hover { background-color: rgba(168, 217, 0, 0.07); }
-html body .ef-thumb { border-radius: 6px; }
-html body .upload-progress-bar { border-radius: 999px; overflow: hidden; }
-html body .upload-progress-fill {
-  border-radius: 999px;
-  transition: width .25s ease;
-  background-image: linear-gradient(90deg, var(--pl-accent), #d4ff4d);
-}
-html body .login-error { animation: pl-shake .3s ease; }
-html body .field-error-msg { animation: pl-fade .2s ease; }
+/* ---- Boş durum ---- */
+.empty-icon { animation: pl-float 3.2s ease-in-out infinite; }
 
-/* ---- Diyalog ve toast ---- */
-html body .dlg-overlay {
-  background: rgba(3, 5, 0, .62);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+/* ---- Düzenleme penceresi ---- */
+.ef-row { transition: background var(--fast); }
+.ef-row:hover { background: var(--hib); }
+.upload-progress-fill { transition: width .25s ease; }
+
+/* ---- Onay kutusu ---- */
+.dlg-overlay {
+  background: var(--scrim);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   animation: pl-fade .15s ease;
 }
-html body .dlg-box {
-  background: #0d0f08;
-  color: #f2f5e6;
-  border: 1px solid rgba(168, 217, 0, .35);
-  border-radius: var(--pl-radius);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .6), 0 0 0 1px rgba(168, 217, 0, .08);
-  animation: pl-pop .18s cubic-bezier(.2, .9, .3, 1.2);
+.dlg-box {
+  max-width: 400px;
+  padding: 26px 28px 22px;
+  background: var(--c1);
+  color: var(--tx);
+  border: 1px solid var(--bd);
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  animation: pl-pop .2s var(--ease);
 }
-html body .dlg-box h4 {
-  font-size: 12px;
-  letter-spacing: .14em;
+.dlg-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  border-style: solid; border-width: 0 16px 16px 0;
+  border-color: transparent var(--hi) transparent transparent;
+}
+.dlg-box h4 {
+  margin: 0 0 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--pl-accent);
-  font-family: ui-monospace, Consolas, monospace;
+  color: var(--hi);
 }
-html body .dlg-box p { font-size: 15px; opacity: .92; }
-html body .dlg-btn { transition: transform .12s ease, filter .15s ease; font-weight: 600; }
-html body .dlg-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
-html body .dlg-btn:active { transform: scale(.97); }
-html body .dlg-cancel { background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }
-html body .dlg-danger { background: #e5484d; box-shadow: 0 4px 16px rgba(229, 72, 77, .35); }
+.dlg-box p { font-size: 15px; line-height: 1.55; opacity: 1; color: var(--tx); margin: 0 0 22px; }
+.dlg-btn {
+  border-radius: 0;
+  padding: 9px 18px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: var(--fast);
+}
+.dlg-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.dlg-btn:active { transform: scale(.97); }
+.dlg-cancel { background: transparent; border: 1px solid var(--bd2); color: var(--t2); }
+.dlg-cancel:hover { border-color: var(--c5); color: var(--tx); }
+.dlg-danger { background: var(--err); color: #fff; }
 
-html body .toast {
-  background: #0d0f08;
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-left: 4px solid var(--pl-accent);
-  border-radius: var(--pl-radius);
-  animation: pl-slide .25s cubic-bezier(.2, .9, .3, 1);
+/* ---- Bildirimler ---- */
+.toast {
+  background: var(--c1);
+  color: var(--tx);
+  border: 1px solid var(--bd2);
+  border-left: 4px solid var(--hi);
+  border-radius: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  font-size: 13.5px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  animation: pl-slide .28s var(--ease);
 }
-html body .toast-success { border-left-color: var(--pl-accent); }
-html body .toast-error { border-left-color: #e5484d; }
+.toast-success { border-left-color: var(--ok); }
+.toast-error { border-left-color: var(--err); }
 
 /* ---- Kaydırma çubuğu ---- */
-html body * { scrollbar-width: thin; scrollbar-color: rgba(168, 217, 0, .45) transparent; }
+* { scrollbar-width: thin; scrollbar-color: var(--c5) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--c4); }
+*::-webkit-scrollbar-thumb:hover { background: var(--hi); }
 
 /* ---- Animasyonlar ---- */
-@keyframes pl-fade  { from { opacity: 0 } to { opacity: 1 } }
-@keyframes pl-pop   { from { opacity: 0; transform: translateY(8px) scale(.96) } to { opacity: 1; transform: none } }
-@keyframes pl-slide { from { opacity: 0; transform: translateX(24px) } to { opacity: 1; transform: none } }
-@keyframes pl-shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
+@keyframes pl-row   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes pl-fade  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pl-pop   { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes pl-slide { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes pl-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  html body *, html body *::before, html body *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; animation-delay: 0s !important; }
 }
+
+

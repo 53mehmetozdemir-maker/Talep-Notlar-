@@ -3,6 +3,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import './index.css';
+import './lib/polish.css';
+import './lib/light.css';
 import App from './App';
 import { AuthProvider } from './context/AuthProvider';
 import { initTheme } from './lib/theme';
@@ -18,4 +20,3 @@ createRoot(document.getElementById('root')!).render(
     </HashRouter>
   </StrictMode>,
 );
-import './lib/polish.css';
