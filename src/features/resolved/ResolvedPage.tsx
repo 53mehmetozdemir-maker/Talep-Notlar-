@@ -1,3 +1,4 @@
+import { appAlert, appConfirm } from '../../lib/dialog';
 import { useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -115,11 +116,11 @@ export function ResolvedPage() {
   }
 
   async function remove(r: ResolvedRecord) {
-    if (!window.confirm('Çözüm kaydını sil?')) return;
+    if (!await appConfirm('Çözüm kaydını sil?')) return;
     try {
       await deleteDoc(doc(db, 'resolvedRecords', r.id));
     } catch (e) {
-      alert('Silme hatası: ' + (e as Error).message);
+      appAlert('Silme hatası: ' + (e as Error).message);
     }
   }
 

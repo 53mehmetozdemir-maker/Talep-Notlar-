@@ -1,3 +1,4 @@
+import { appAlert, appConfirm, appToast } from '../../lib/dialog';
 import { useMemo, useState } from 'react';
 import { useAuth } from '../../context/auth-context';
 import { useCollection } from '../../hooks/useCollection';
@@ -66,13 +67,13 @@ export function RecordsPage() {
   }
 
   async function handleDelete(record: TalepRecord) {
-    if (!window.confirm('Kaydı Sil?')) return;
+    if (!await appConfirm('Kaydı Sil?')) return;
     setDeletingId(record.id);
     try {
       await deleteRecord(record);
     } catch (err) {
       console.error('Kayıt silinemedi:', err);
-      window.alert(`Kayıt silinemedi: ${err instanceof Error ? err.message : 'bilinmeyen hata'}`);
+      appAlert(`Kayıt silinemedi: ${err instanceof Error ? err.message : 'bilinmeyen hata'}`);
     } finally {
       setDeletingId(null);
     }
@@ -106,7 +107,7 @@ export function RecordsPage() {
             type="button"
             onClick={() => {
               if (!filtered.length) {
-                window.alert('İndirilecek veri bulunamadı!');
+                appToast('İndirilecek veri bulunamadı!', 'info');
                 return;
               }
               exportRecordsToExcel(filtered);

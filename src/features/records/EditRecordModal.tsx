@@ -1,3 +1,4 @@
+import { appConfirm } from '../../lib/dialog';
 import { useState } from 'react';
 import { FilePicker } from '../../components/FilePicker';
 import type { PendingFile } from '../../components/FilePicker';
@@ -37,7 +38,7 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
   }
 
   async function handleRemoveFile(f: RecordFile) {
-    if (!window.confirm(`"${f.name}" dosyası silinsin mi?`)) return;
+    if (!await appConfirm(`"${f.name}" dosyası silinsin mi?`)) return;
     setError('');
     setDeletingUrl(f.url);
     try {

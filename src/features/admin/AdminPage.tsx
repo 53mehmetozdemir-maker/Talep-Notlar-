@@ -1,3 +1,4 @@
+import { appAlert, appConfirm } from '../../lib/dialog';
 import { useState } from 'react';
 import { deleteApp, initializeApp } from 'firebase/app';
 import { createUserWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
@@ -79,7 +80,7 @@ function SimpleList({
             <button
               className="x-del"
               type="button"
-              onClick={() => window.confirm(`"${it.name}" silinsin mi?`) && onDelete(it.id)}
+              onClick={async () => await appConfirm(`"${it.name}" silinsin mi?`) && onDelete(it.id)}
             >
               ✖
             </button>
@@ -155,16 +156,16 @@ export function AdminPage() {
     try {
       await updateDoc(doc(db, 'users', u.id), { role: r });
     } catch (e) {
-      alert('Yetki güncellenemedi: ' + (e as Error).message);
+      appAlert('Yetki güncellenemedi: ' + (e as Error).message);
     }
   }
 
   async function removeUser(u: UserDoc) {
-    if (!window.confirm(`${u.email} kullanıcısı silinsin mi?`)) return;
+    if (!await appConfirm(`${u.email} kullanıcısı silinsin mi?`)) return;
     try {
       await deleteDoc(doc(db, 'users', u.id));
     } catch (e) {
-      alert('Silme hatası: ' + (e as Error).message);
+      appAlert('Silme hatası: ' + (e as Error).message);
     }
   }
 
