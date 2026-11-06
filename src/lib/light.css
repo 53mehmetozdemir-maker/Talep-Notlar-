@@ -146,3 +146,27 @@ html[data-theme="light"] body::before {
 [data-theme="light"] ::selection { background: var(--lime); color: var(--ink); }
 [data-theme="light"] *::-webkit-scrollbar-thumb { background: var(--c5); }
 [data-theme="light"] *::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+/* ===== v4 ek yama ===== */
+[data-theme="light"] .wrap { max-width: 1360px; }
+
+[data-theme="light"] .panel {
+  border-top: 3px solid var(--ink);
+  box-shadow: 0 1px 0 rgba(12,16,24,.04), 0 14px 34px -18px rgba(12,16,24,.28);
+}
+
+[data-theme="light"] .act {
+  background: var(--c1);
+  border: 1px solid var(--c4);
+  color: var(--ink);
+  font-weight: 700;
+}
+[data-theme="light"] .act:hover:not(:disabled) { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+[data-theme="light"] .act-del { color: #c2183a; border-color: rgba(194,24,58,.35); }
+[data-theme="light"] .act-del:hover:not(:disabled) { background: #c2183a; color: #fff; border-color: #c2183a; }
+
+[data-theme="light"] th { font-size: 10.5px; letter-spacing: .14em; }
+[data-theme="light"] td { padding-top: 14px; padding-bottom: 14px; }
+[data-theme="light"] tbody tr:hover td { background: rgba(200,255,0,.22); }
+
+[data-theme="light"] .qf-count { color: var(--t2); }
+[data-theme="light"] .page-hdr h2 { font-size: clamp(2.2rem, 4.4vw, 3.6rem); }
