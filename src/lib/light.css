@@ -1,123 +1,148 @@
-/* ===== AÇIK TEMA ===== */
-[data-theme="light"] {
-  --c0: #eceff6;
+/* ===== AÇIK TEMA v3: mürekkep + lime ===== */
+html[data-theme="light"], [data-theme="light"] {
+  --ink: #0c1018;
+  --lime: #c8ff00;
+  --c0: #f3f4f6;
   --c1: #ffffff;
-  --c2: #f6f7fb;
-  --c3: #e9ecf4;
-  --c4: #d7dbe8;
-  --c5: #a9b0c7;
-  --tx: #12142a;
-  --t2: #454b6b;
-  --t3: #767d99;
-  --hi: #4b27f5;
-  --hi2: #e2006a;
-  --hi3: #0079bf;
-  --hib: rgba(75, 39, 245, 0.07);
-  --hib2: rgba(226, 0, 106, 0.07);
-  --bd: rgba(75, 39, 245, 0.30);
-  --bd2: rgba(18, 20, 42, 0.13);
-  --scrim: rgba(18, 20, 42, 0.45);
+  --c2: #f7f8fa;
+  --c3: #eceef2;
+  --c4: #d9dce4;
+  --c5: #aab0bf;
+  --tx: #0c1018;
+  --t2: #484e5e;
+  --t3: #7a8093;
+  --hi: #0c1018;
+  --hi2: #ff5a36;
+  --hi3: #0a6fb5;
+  --hib: rgba(200, 255, 0, 0.20);
+  --bd: rgba(12, 16, 24, 0.30);
+  --bd2: rgba(12, 16, 24, 0.11);
+  --scrim: rgba(12, 16, 24, 0.55);
   --card-shine: none;
-  --sh1: 0 1px 2px rgba(18, 20, 42, .06), 0 6px 18px -8px rgba(18, 20, 42, .14);
-  --sh2: 0 2px 4px rgba(18, 20, 42, .06), 0 16px 40px -12px rgba(18, 20, 42, .22);
+  --sh1: 0 1px 2px rgba(12, 16, 24, .05), 0 8px 24px -12px rgba(12, 16, 24, .18);
+  --sh2: 0 2px 6px rgba(12, 16, 24, .08), 0 24px 56px -18px rgba(12, 16, 24, .35);
 }
 
-/* Zemin: hafif renkli ışık hâlesi */
-[data-theme="light"] html,
-[data-theme="light"] body,
-[data-theme="light"] #root { background: var(--c0); }
-[data-theme="light"] body::before {
-  background:
-    radial-gradient(700px 360px at 8% -5%, rgba(75, 39, 245, .09), transparent 70%),
-    radial-gradient(600px 320px at 100% 0%, rgba(226, 0, 106, .06), transparent 70%);
+/* ---- Zemin: çok silik milimetrik ızgara ---- */
+html[data-theme="light"], html[data-theme="light"] body, html[data-theme="light"] #root { background: var(--c0); }
+html[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(rgba(12, 16, 24, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12, 16, 24, .045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: none;
 }
 
-/* Menü */
+/* ---- Menü: koyu çubuk ---- */
 [data-theme="light"] nav {
-  background: rgba(255, 255, 255, .92);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--bd2);
-  box-shadow: 0 4px 18px -10px rgba(18, 20, 42, .25);
+  background: var(--ink);
+  border-bottom: 1px solid #000;
+  box-shadow: 0 10px 30px -18px rgba(12, 16, 24, .7);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
-[data-theme="light"] .nav-logo { color: #fff; }
-[data-theme="light"] nav button:hover,
-[data-theme="light"] nav a:hover { background: var(--c3); color: var(--tx); }
-[data-theme="light"] nav button.active,
-[data-theme="light"] nav a.active { background: var(--hib); color: var(--hi); border-color: var(--bd); box-shadow: inset 0 -2px 0 var(--hi); }
-[data-theme="light"] .theme-btn { background: var(--c1) !important; }
+[data-theme="light"] nav::after { display: none; }
+[data-theme="light"] .nav-brand { color: #fff; }
+[data-theme="light"] .nav-logo { background: var(--lime); color: var(--ink); box-shadow: none; }
+[data-theme="light"] nav button, [data-theme="light"] nav a { color: #aeb4c6; }
+[data-theme="light"] nav button:hover, [data-theme="light"] nav a:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+[data-theme="light"] nav button.active, [data-theme="light"] nav a.active {
+  color: var(--lime); background: rgba(200, 255, 0, .10); border-color: rgba(200, 255, 0, .35);
+  box-shadow: inset 0 -2px 0 var(--lime);
+}
+[data-theme="light"] nav button.logout-btn { border-color: rgba(255, 255, 255, .16); color: #aeb4c6; }
+[data-theme="light"] nav button.logout-btn:hover { background: rgba(255, 68, 102, .15); color: #ff8095; border-color: rgba(255, 68, 102, .4); }
+[data-theme="light"] .theme-btn {
+  background: rgba(255, 255, 255, .08) !important;
+  color: #dfe3ee !important;
+  border-color: rgba(255, 255, 255, .16) !important;
+}
+[data-theme="light"] .theme-btn:hover { background: rgba(200, 255, 0, .15) !important; color: var(--lime) !important; border-color: rgba(200, 255, 0, .4) !important; }
 
-/* Başlıklar */
-[data-theme="light"] .page-hdr h2 { color: var(--tx); }
+/* ---- Başlıklar: fosforlu kalem vurgusu ---- */
+[data-theme="light"] .page-hdr h2 { color: var(--ink); }
+[data-theme="light"] .page-hdr h2 em,
+[data-theme="light"] .login-box h1 em {
+  color: var(--ink);
+  padding: 0 .12em;
+  background: linear-gradient(transparent 56%, var(--lime) 56%, var(--lime) 93%, transparent 93%);
+}
 [data-theme="light"] .page-hdr p { color: var(--t2); }
+[data-theme="light"] .page-hdr::after { width: 48px; height: 4px; background: var(--ink); box-shadow: 12px 0 0 var(--lime); }
 
-/* Kartlar / paneller */
+/* ---- Paneller ---- */
 [data-theme="light"] .panel {
-  background: var(--c1);
-  border: 1px solid var(--bd2);
-  box-shadow: var(--sh1);
+  background: var(--c1); border: 1px solid var(--bd2); box-shadow: var(--sh1);
+  transition: box-shadow .25s ease, border-color .25s ease;
 }
-[data-theme="light"] .panel:hover { border-color: var(--bd); }
+[data-theme="light"] .panel:hover { border-color: var(--bd); box-shadow: var(--sh2); }
 [data-theme="light"] .login-box { background: var(--c1); border: 1px solid var(--bd2); box-shadow: var(--sh2); }
-[data-theme="light"] .login-logo { color: #fff; }
+[data-theme="light"] .login-box::before { border-color: transparent var(--lime) transparent transparent; }
+[data-theme="light"] .login-box::after { border-color: transparent transparent var(--ink) transparent; }
+[data-theme="light"] .login-logo { background: var(--lime); color: var(--ink); }
 
-/* Form elemanları */
-[data-theme="light"] input,
-[data-theme="light"] select,
-[data-theme="light"] textarea {
-  background-color: var(--c1);
-  border: 1px solid var(--c4);
-  color: var(--tx);
-  box-shadow: inset 0 1px 2px rgba(18, 20, 42, .04);
+/* ---- Form ---- */
+[data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea {
+  background-color: var(--c1); border: 1px solid var(--c4); color: var(--tx);
 }
-[data-theme="light"] input:hover,
-[data-theme="light"] select:hover,
-[data-theme="light"] textarea:hover { border-color: var(--c5); }
-[data-theme="light"] input:focus,
-[data-theme="light"] select:focus,
-[data-theme="light"] textarea:focus {
-  background-color: var(--c1);
-  border-color: var(--hi);
-  box-shadow: 0 0 0 3px rgba(75, 39, 245, .16);
+[data-theme="light"] input:hover, [data-theme="light"] select:hover, [data-theme="light"] textarea:hover { border-color: var(--c5); }
+[data-theme="light"] input:focus, [data-theme="light"] select:focus, [data-theme="light"] textarea:focus {
+  background-color: var(--c1); border-color: var(--ink); box-shadow: 0 0 0 3px rgba(200, 255, 0, .65);
 }
 [data-theme="light"] label { color: var(--t2); }
 
-/* Düğmeler */
-[data-theme="light"] .btn-primary { color: #fff; background: var(--hi); }
-[data-theme="light"] .btn-primary:hover { filter: brightness(1.1); }
+/* ---- Düğmeler ---- */
+[data-theme="light"] .btn-primary { background: var(--ink); color: var(--lime); }
+[data-theme="light"] .btn-primary:hover:not(:disabled) { background: #1a2030; filter: none; box-shadow: 0 8px 20px -8px rgba(12, 16, 24, .6); }
 [data-theme="light"] .btn-cancel { background: var(--c1); border-color: var(--c4); color: var(--t2); }
-[data-theme="light"] .btn-cancel:hover { background: var(--c3); color: var(--tx); }
+[data-theme="light"] .btn-cancel:hover { background: var(--c3); color: var(--ink); border-color: var(--c5); }
 
-/* Filtre çubukları */
+/* ---- Filtreler ---- */
 [data-theme="light"] .quick-filter-bar { background: var(--c2); }
 [data-theme="light"] .qf-btn { background: var(--c1); border-color: var(--c4); color: var(--t2); }
-[data-theme="light"] .qf-btn:hover { border-color: var(--hi); color: var(--hi); background: var(--hib); }
-[data-theme="light"] .qf-btn.qf-active { background: var(--hi); color: #fff; border-color: var(--hi); box-shadow: 0 4px 12px -4px rgba(75, 39, 245, .55); }
+[data-theme="light"] .qf-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--hib); }
+[data-theme="light"] .qf-btn.qf-active { background: var(--ink); color: var(--lime); border-color: var(--ink); box-shadow: none; }
 
-/* Tablo */
-[data-theme="light"] th { background: var(--c3); color: var(--t2); border-bottom: 1px solid var(--c4); }
+/* ---- Tablo ---- */
+[data-theme="light"] th { background: var(--c1); color: var(--ink); border-bottom: 2px solid var(--ink); }
 [data-theme="light"] td { border-bottom: 1px solid var(--bd2); color: var(--tx); }
 [data-theme="light"] tbody tr:nth-child(even) td { background: var(--c2); }
-[data-theme="light"] tbody tr:hover td { background: var(--hib); }
-[data-theme="light"] td b { background: var(--hib); color: var(--hi); border-color: var(--bd); }
-[data-theme="light"] .cell-date { color: var(--t2); }
-[data-theme="light"] .cell-user { color: var(--t2); }
-[data-theme="light"] .time-chip,
-[data-theme="light"] .attach-chip { background: rgba(0, 121, 191, .09); border-color: rgba(0, 121, 191, .28); color: var(--hi3); }
+[data-theme="light"] tbody tr:hover td { background: rgba(200, 255, 0, .16); }
+[data-theme="light"] tbody tr:hover td:first-child { box-shadow: inset 4px 0 0 var(--ink); }
+[data-theme="light"] td b { background: var(--lime); color: var(--ink); border: 1px solid rgba(12, 16, 24, .85); }
+[data-theme="light"] .cell-date, [data-theme="light"] .cell-user { color: var(--t2); }
+[data-theme="light"] .time-chip, [data-theme="light"] .attach-chip {
+  background: rgba(10, 111, 181, .09); border-color: rgba(10, 111, 181, .28); color: var(--hi3);
+}
 [data-theme="light"] .attach-chip:hover { background: var(--hi3); color: #fff; }
-[data-theme="light"] .empty-icon { background: var(--hib); border-color: var(--bd); }
+[data-theme="light"] .desc-read-more { color: var(--ink); text-decoration: underline; text-decoration-color: var(--lime); text-decoration-thickness: 3px; text-underline-offset: 2px; }
+[data-theme="light"] .empty-icon { background: var(--lime); border-color: var(--ink); }
 
-/* Pencereler */
-[data-theme="light"] .desc-modal-inner,
-[data-theme="light"] .edit-modal-inner { background: var(--c1); border: 1px solid var(--bd); box-shadow: var(--sh2); }
+/* ---- Pencereler ---- */
+[data-theme="light"] .desc-modal-inner, [data-theme="light"] .edit-modal-inner {
+  background: var(--c1); border: 1px solid var(--bd); box-shadow: var(--sh2);
+}
+[data-theme="light"] .desc-modal-inner::before { border-color: transparent var(--lime) transparent transparent; }
 [data-theme="light"] .desc-modal-close { background: var(--c2); }
+[data-theme="light"] .desc-modal-badge { color: var(--ink); background: var(--lime); border-color: var(--ink); }
 
-/* Onay kutusu ve bildirimler */
-[data-theme="light"] .dlg-box { background: var(--c1); color: var(--tx); border: 1px solid var(--bd); }
+/* ---- Onay kutusu & bildirimler ---- */
+[data-theme="light"] .dlg-box {
+  background: var(--c1); color: var(--tx); border: 1px solid var(--bd);
+  filter: drop-shadow(0 22px 36px rgba(12, 16, 24, .35));
+}
+[data-theme="light"] .dlg-box::before { border-color: transparent var(--lime) transparent transparent; }
+[data-theme="light"] .dlg-box h4 { color: var(--ink); }
 [data-theme="light"] .dlg-box p { color: var(--tx); }
 [data-theme="light"] .dlg-cancel { background: var(--c1); border-color: var(--c4); color: var(--t2); }
-[data-theme="light"] .dlg-cancel:hover { background: var(--c3); color: var(--tx); }
-[data-theme="light"] .toast { background: var(--c1); color: var(--tx); border-color: var(--bd2); box-shadow: var(--sh2); }
+[data-theme="light"] .dlg-cancel:hover { background: var(--c3); color: var(--ink); }
+[data-theme="light"] .toast {
+  background: var(--ink); color: #f3f4f6; border: 1px solid #000; border-left: 4px solid var(--lime);
+  box-shadow: none; filter: drop-shadow(0 12px 20px rgba(12, 16, 24, .3));
+}
+[data-theme="light"] .toast-error { border-left-color: #ff4466; }
+[data-theme="light"] .toast-success { border-left-color: var(--lime); }
 
-/* Seçim ve kaydırma çubuğu */
-[data-theme="light"] ::selection { background: var(--hi); color: #fff; }
+/* ---- Seçim & kaydırma ---- */
+[data-theme="light"] ::selection { background: var(--lime); color: var(--ink); }
 [data-theme="light"] *::-webkit-scrollbar-thumb { background: var(--c5); }
+[data-theme="light"] *::-webkit-scrollbar-thumb:hover { background: var(--ink); }
