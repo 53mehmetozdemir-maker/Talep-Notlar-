@@ -192,3 +192,7 @@ input.input-error{border-color:var(--err)!important;background:var(--err-bg)!imp
 .edit-field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0;}
 .edit-field-full{margin-top:14px;}
 @media(max-width:900px){.edit-modal-inner{padding:24px 20px;}.edit-field-row{grid-template-columns:1fr;}}
+
+/* ===== YUMUSATMA-BASLANGIC (geri almak icin bu blogu silin) ===== */
+[data-theme="dark"]{--hi:#a8d400;--hib:rgba(168,212,0,0.09);--bd:rgba(168,212,0,0.16);--tx:#e2e2f0;--hi3:#33c9d6;--hi2:#e0399a}
+/* ===== YUMUSATMA-BITIS ===== */

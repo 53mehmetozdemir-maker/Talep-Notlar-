@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { FilePicker } from '../../components/FilePicker';
 import type { PendingFile } from '../../components/FilePicker';
-import type { Department, TalepRecord } from '../../lib/types';
-import { saveRecordEdit } from './api';
+import { fileEmoji, isHttpUrl, isImage } from '../../lib/files';
+import type { Department, RecordFile, TalepRecord } from '../../lib/types';
+import { removeRecordFile, saveRecordEdit } from './api';
 import { Modal } from './Modal';
 
 interface Props {
@@ -19,16 +20,34 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
   const [desc, setDesc] = useState(record.desc ?? '');
   const [pending, setPending] = useState<PendingFile[]>([]);
   const [busy, setBusy] = useState(false);
+  const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ pct: number; name: string } | null>(null);
   const [noError, setNoError] = useState('');
   const [error, setError] = useState('');
+
+  const existing = record.files ?? [];
+  const locked = busy || deletingUrl !== null;
 
   const deptNames = departments.map((d) => d.name);
   // Departman sonradan silinmişse mevcut değer yine de seçenekte kalsın.
   if (dept && !deptNames.includes(dept)) deptNames.push(dept);
 
   function close() {
-    if (!busy) onClose();
+    if (!locked) onClose();
+  }
+
+  async function handleRemoveFile(f: RecordFile) {
+    if (!window.confirm(`"${f.name}" dosyası silinsin mi?`)) return;
+    setError('');
+    setDeletingUrl(f.url);
+    try {
+      await removeRecordFile(record, f);
+    } catch (err) {
+      console.error('Dosya silinemedi:', err);
+      setError(`Dosya silinemedi: ${err instanceof Error ? err.message : 'bilinmeyen hata'}`);
+    } finally {
+      setDeletingUrl(null);
+    }
   }
 
   async function handleSave() {
@@ -87,7 +106,7 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
               id="edit-no"
               className={noError ? 'input-error' : undefined}
               value={no}
-              disabled={busy}
+              disabled={locked}
               onChange={(e) => {
                 setNo(e.target.value);
                 setNoError('');
@@ -97,12 +116,12 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
           </div>
           <div>
             <label htmlFor="edit-date">Tarih</label>
-            <input id="edit-date" type="date" value={date} disabled={busy} onChange={(e) => setDate(e.target.value)} />
+            <input id="edit-date" type="date" value={date} disabled={locked} onChange={(e) => setDate(e.target.value)} />
           </div>
         </div>
         <div className="edit-field-full">
           <label htmlFor="edit-dept">Departman</label>
-          <select id="edit-dept" value={dept} disabled={busy} onChange={(e) => setDept(e.target.value)}>
+          <select id="edit-dept" value={dept} disabled={locked} onChange={(e) => setDept(e.target.value)}>
             {deptNames.map((n) => (
               <option key={n} value={n}>
                 {n}
@@ -117,15 +136,51 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
             rows={6}
             placeholder="Talep detaylarını güncelleyin..."
             value={desc}
-            disabled={busy}
+            disabled={locked}
             onChange={(e) => setDesc(e.target.value)}
           />
         </div>
 
+        {existing.length > 0 && (
+          <>
+            <div className="divider">
+              <span>mevcut dosyalar</span>
+            </div>
+            <div className="ef-list">
+              {existing.map((f) => (
+                <div className="ef-row" key={f.url}>
+                  {isHttpUrl(f.url) && isImage(f.name) ? (
+                    <img className="ef-thumb" src={f.url} alt="" />
+                  ) : (
+                    <div className="ef-icon">{fileEmoji(f.name)}</div>
+                  )}
+                  <a
+                    className="ef-name"
+                    href={isHttpUrl(f.url) ? f.url : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={f.name}
+                  >
+                    {f.name}
+                  </a>
+                  <button
+                    type="button"
+                    className="act act-del"
+                    disabled={locked}
+                    onClick={() => void handleRemoveFile(f)}
+                  >
+                    {deletingUrl === f.url ? 'Siliniyor...' : '🗑 Sil'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
         <div className="divider">
           <span>dosya ekle (isteğe bağlı)</span>
         </div>
-        <FilePicker files={pending} onChange={setPending} onError={setError} disabled={busy} />
+        <FilePicker files={pending} onChange={setPending} onError={setError} disabled={locked} />
 
         {progress && (
           <div className="upload-progress">
@@ -139,10 +194,10 @@ export function EditRecordModal({ record, records, departments, onClose }: Props
         )}
         {error && <div className="login-error" role="alert" style={{ marginTop: 14 }}>{error}</div>}
 
-        <button type="button" className="btn-primary" style={{ marginTop: 20 }} disabled={busy} onClick={handleSave}>
+        <button type="button" className="btn-primary" style={{ marginTop: 20 }} disabled={locked} onClick={handleSave}>
           {busy ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
         </button>
-        <button type="button" className="btn-cancel" disabled={busy} onClick={close}>
+        <button type="button" className="btn-cancel" disabled={locked} onClick={close}>
           İptal
         </button>
       </div>

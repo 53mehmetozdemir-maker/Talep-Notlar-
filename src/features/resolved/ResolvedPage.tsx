@@ -26,7 +26,8 @@ export function ResolvedPage() {
   const [end, setEnd] = useState('');
   const [quick, setQuick] = useState('all');
 
-  const base = useMemo(() => (admin ? all : all.filter((r) => r.user === me)), [all, admin, me]);
+  const seeAll = admin || role === 'gözlemci';
+  const base = useMemo(() => (seeAll ? all : all.filter((r) => r.user === me)), [all, seeAll, me]);
 
   const users = useMemo(
     () =>
@@ -129,8 +130,7 @@ export function ResolvedPage() {
           Çözülen <em>Talepler</em>
         </h2>
         <p>
-          {admin
-            ? 'Tüm kullanıcıların çözüm kayıtlarını görüntülüyorsunuz'
+          {seeAll ? 'Tüm kullanıcıların çözüm kayıtlarını görüntülüyorsunuz'
             : 'Çözdüğünüz talepleri buradan kayıt altına alın'}
         </p>
       </div>

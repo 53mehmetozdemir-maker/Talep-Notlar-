@@ -39,3 +39,21 @@ export async function deleteRecord(record: TalepRecord): Promise<void> {
   }
   await deleteDoc(doc(db, 'records', record.id));
 }
+
+
+/** Tek bir dosyayı önce Storage'dan, sonra kayıttan siler. */
+export async function removeRecordFile(
+  record: TalepRecord,
+  file: NonNullable<TalepRecord['files']>[number],
+): Promise<void> {
+  if (file.path) {
+    try {
+      await deleteObject(ref(storage, file.path));
+    } catch (err) {
+      if ((err as { code?: string }).code !== 'storage/object-not-found') throw err;
+    }
+  }
+  await updateDoc(doc(db, 'records', record.id), {
+    files: (record.files ?? []).filter((f) => f.url !== file.url),
+  });
+}
