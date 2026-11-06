@@ -9,6 +9,7 @@ import { EditRecordModal } from './EditRecordModal';
 import { FileModal } from './FileModal';
 import { filterRecords } from './filters';
 import { canModifyRecord } from './permissions';
+import { exportRecordsToExcel } from './exportExcel';
 
 type QuickMode = 'today' | 'week' | 'month' | 'all';
 
@@ -101,6 +102,41 @@ export function RecordsPage() {
           ))}
           <div className="qf-divider" />
           <span className="qf-count">{filtered.length} kayıt</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (!filtered.length) {
+                window.alert('İndirilecek veri bulunamadı!');
+                return;
+              }
+              exportRecordsToExcel(filtered);
+            }}
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 7,
+              height: 40,
+              padding: '0 18px',
+              background: 'var(--ok-bg)',
+              color: 'var(--ok)',
+              border: '1px solid var(--ok-bd)',
+              fontFamily: 'inherit',
+              fontWeight: 700,
+              fontSize: 12,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Excel
+          </button>
         </div>
         <div className="filter-row">
           <div>
@@ -146,8 +182,7 @@ export function RecordsPage() {
                 setQuick('custom');
               }}
             />
-          </div>
-        </div>
+          </div></div>
       </div>
 
       <div className="panel" style={{ overflowX: 'auto' }}>

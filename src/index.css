@@ -100,7 +100,7 @@ td b{font-family:'Space Mono',monospace;font-weight:700;font-size:11px;letter-sp
 .time-chip{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--hi3);background:rgba(60,239,255,0.08);border:1px solid rgba(60,239,255,0.2);padding:2px 7px;margin-left:6px;display:inline-block;}
 .attach-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(60,239,255,0.08);border:1px solid rgba(60,239,255,0.2);color:var(--hi3);padding:2px 8px;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:var(--fast);margin-left:6px;}
 .attach-chip:hover{background:var(--hi3);color:var(--c0);}
-.desc-cell-text{font-size:13.5px;line-height:1.5;max-width:300px;word-break:break-word;white-space:pre-line;}
+.desc-cell-text{font-size:13.5px;line-height:1.5;max-width:300px;word-break:break-word;}
 .desc-read-more{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--hi);cursor:pointer;border:none;background:transparent;padding:2px 0;transition:var(--fast);}
 .desc-read-more:hover{opacity:0.7;}
 .empty{text-align:center;padding:70px 20px;}
