@@ -1,0 +1,107 @@
+:root { --pl-accent: #a8d900; --pl-accent-soft: rgba(168, 217, 0, 0.18); --pl-radius: 10px; }
+
+/* ---- Odak halkası ---- */
+html body input:focus,
+html body select:focus,
+html body textarea:focus {
+  outline: none;
+  border-color: var(--pl-accent);
+  box-shadow: 0 0 0 3px var(--pl-accent-soft);
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+html body input, html body select, html body textarea {
+  transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+}
+html body :focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
+
+/* ---- Düğmeler ---- */
+html body .btn-primary,
+html body .btn-cancel,
+html body .act {
+  transition: transform .12s ease, filter .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+html body .btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 22px var(--pl-accent-soft);
+  transform: translateY(-1px);
+}
+html body .btn-primary:active:not(:disabled),
+html body .act:active:not(:disabled) { transform: translateY(0) scale(.98); }
+html body .btn-cancel:hover:not(:disabled) { filter: brightness(1.25); }
+html body .act:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+html body button:disabled { cursor: not-allowed; opacity: .55; }
+
+/* ---- Tablo ---- */
+html body table tbody tr { transition: background-color .15s ease, box-shadow .15s ease; }
+html body table tbody tr:hover {
+  background-color: var(--pl-accent-soft);
+  box-shadow: inset 3px 0 0 var(--pl-accent);
+}
+
+/* ---- Modal içi ---- */
+html body .ef-row { transition: background-color .15s ease, transform .15s ease; border-radius: 8px; }
+html body .ef-row:hover { background-color: rgba(168, 217, 0, 0.07); }
+html body .ef-thumb { border-radius: 6px; }
+html body .upload-progress-bar { border-radius: 999px; overflow: hidden; }
+html body .upload-progress-fill {
+  border-radius: 999px;
+  transition: width .25s ease;
+  background-image: linear-gradient(90deg, var(--pl-accent), #d4ff4d);
+}
+html body .login-error { animation: pl-shake .3s ease; }
+html body .field-error-msg { animation: pl-fade .2s ease; }
+
+/* ---- Diyalog ve toast ---- */
+html body .dlg-overlay {
+  background: rgba(3, 5, 0, .62);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: pl-fade .15s ease;
+}
+html body .dlg-box {
+  background: #0d0f08;
+  color: #f2f5e6;
+  border: 1px solid rgba(168, 217, 0, .35);
+  border-radius: var(--pl-radius);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .6), 0 0 0 1px rgba(168, 217, 0, .08);
+  animation: pl-pop .18s cubic-bezier(.2, .9, .3, 1.2);
+}
+html body .dlg-box h4 {
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--pl-accent);
+  font-family: ui-monospace, Consolas, monospace;
+}
+html body .dlg-box p { font-size: 15px; opacity: .92; }
+html body .dlg-btn { transition: transform .12s ease, filter .15s ease; font-weight: 600; }
+html body .dlg-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+html body .dlg-btn:active { transform: scale(.97); }
+html body .dlg-cancel { background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }
+html body .dlg-danger { background: #e5484d; box-shadow: 0 4px 16px rgba(229, 72, 77, .35); }
+
+html body .toast {
+  background: #0d0f08;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-left: 4px solid var(--pl-accent);
+  border-radius: var(--pl-radius);
+  animation: pl-slide .25s cubic-bezier(.2, .9, .3, 1);
+}
+html body .toast-success { border-left-color: var(--pl-accent); }
+html body .toast-error { border-left-color: #e5484d; }
+
+/* ---- Kaydırma çubuğu ---- */
+html body * { scrollbar-width: thin; scrollbar-color: rgba(168, 217, 0, .45) transparent; }
+
+/* ---- Animasyonlar ---- */
+@keyframes pl-fade  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pl-pop   { from { opacity: 0; transform: translateY(8px) scale(.96) } to { opacity: 1; transform: none } }
+@keyframes pl-slide { from { opacity: 0; transform: translateX(24px) } to { opacity: 1; transform: none } }
+@keyframes pl-shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
+
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
