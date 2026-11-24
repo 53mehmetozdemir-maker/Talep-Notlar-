@@ -64,6 +64,10 @@ input:focus{border-color:var(--hi);background:var(--hib);box-shadow:0 0 0 2px va
 .login-box input{margin-bottom:10px;padding:13px 14px;text-align:left;font-size:14px;}
 .login-box .btn-primary{font-size:13px;padding:14px;}
 .login-error{background:var(--err-bg);border:1px solid var(--err-bd);color:var(--err);font-size:13px;padding:10px 12px;text-align:left;margin-top:4px;}
+.login-info{border:1px solid var(--bd);color:var(--t1);font-size:13px;padding:10px 12px;text-align:left;margin-top:4px;line-height:1.5;}
+.login-forgot{background:none;border:0;color:var(--t2);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.08em;text-decoration:underline;cursor:pointer;margin-top:14px;padding:4px;align-self:center;}
+.login-forgot:hover:not(:disabled){color:var(--hi);}
+.login-forgot:disabled{opacity:0.5;cursor:default;}
 
 /* ===== FORM: SELECT / LABEL / TARİH ===== */
 label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--t3);margin-bottom:6px;font-family:'Space Mono',monospace;}
