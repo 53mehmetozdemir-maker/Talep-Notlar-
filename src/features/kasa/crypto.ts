@@ -33,13 +33,14 @@ export async function deriveKey(
   password: string,
   salt: Uint8Array<ArrayBuffer>,
   iterations: number,
+  extractable = false,
 ): Promise<CryptoKey> {
   const base = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
     { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
     base,
     { name: 'AES-GCM', length: 256 },
-    false,
+    extractable,
     ['encrypt', 'decrypt'],
   );
 }
@@ -95,27 +96,121 @@ export async function openNote(key: CryptoKey, docId: string, sealed: Sealed): P
   };
 }
 
+/**
+ * kasaMeta/config. Yeni sistemde sadece { check, keysVersion: 2 } vardır.
+ * Eski ortak-şifre sisteminden kalan { salt, iterations } alanları geçişte silinir.
+ */
 export interface VaultMeta {
+  check: Sealed;
+  keysVersion?: number;
+  salt?: string;
+  iterations?: number;
+}
+
+export const isKeysV2 = (m: VaultMeta): boolean => m.keysVersion === 2;
+
+export function makeCheck(key: CryptoKey): Promise<Sealed> {
+  return seal(key, META_CHECK, META_AAD);
+}
+
+export async function verifyCheck(key: CryptoKey, check: Sealed): Promise<boolean> {
+  try {
+    return (await open(key, check, META_AAD)) === META_CHECK;
+  } catch {
+    return false;
+  }
+}
+
+/** Eski ortak master şifreyle anahtarı türetir (sadece geçiş için, dışa aktarılabilir). */
+export async function unlockLegacy(password: string, meta: VaultMeta): Promise<CryptoKey | null> {
+  if (!meta.salt || !meta.iterations) return null;
+  const key = await deriveKey(password, fromB64(meta.salt), meta.iterations, true);
+  return (await verifyCheck(key, meta.check)) ? key : null;
+}
+
+/* ---------- Veri anahtarı (DEK) ---------- */
+
+/** Notları şifreleyen rastgele anahtar. Yönetici oturumlarında başkasına sarmak için dışa aktarılabilir. */
+export function generateDek(): Promise<CryptoKey> {
+  return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+}
+
+export async function exportDek(key: CryptoKey): Promise<Uint8Array<ArrayBuffer>> {
+  return new Uint8Array(await crypto.subtle.exportKey('raw', key));
+}
+
+export function importDek(raw: Uint8Array<ArrayBuffer>, extractable: boolean): Promise<CryptoKey> {
+  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, extractable, ['encrypt', 'decrypt']);
+}
+
+/* ---------- Kullanıcı anahtar çifti (giriş şifresiyle korunur) ---------- */
+
+/** kasaUsers/{uid} belgesi: açık anahtar + giriş şifresiyle şifreli özel anahtar. */
+export interface UserKeyRecord {
+  email: string;
+  publicKey: string;
   salt: string;
   iterations: number;
-  check: Sealed;
+  wrappedPrivate: Sealed;
 }
 
-export async function createMeta(password: string): Promise<{ meta: VaultMeta; key: CryptoKey }> {
+const RSA = { name: 'RSA-OAEP', hash: 'SHA-256' } as const;
+const privAad = (uid: string) => `kasa-priv:${uid}`;
+
+async function sealPrivate(password: string, uid: string, pkcs8: Uint8Array<ArrayBuffer>) {
   const salt = randomBytes(16);
-  const key = await deriveKey(password, salt, KDF_ITERATIONS);
-  const check = await seal(key, META_CHECK, META_AAD);
-  return { meta: { salt: toB64(salt), iterations: KDF_ITERATIONS, check }, key };
+  const pwKey = await deriveKey(password, salt, KDF_ITERATIONS);
+  return { salt: toB64(salt), iterations: KDF_ITERATIONS, wrappedPrivate: await seal(pwKey, toB64(pkcs8), privAad(uid)) };
 }
 
-/** Şifre doğruysa anahtarı döner, yanlışsa null. */
-export async function unlockWithMeta(password: string, meta: VaultMeta): Promise<CryptoKey | null> {
+export async function createUserKeys(password: string, uid: string, email: string): Promise<UserKeyRecord> {
+  const pair = await crypto.subtle.generateKey({ ...RSA, modulusLength: 3072, publicExponent: new Uint8Array([1, 0, 1]) }, true, [
+    'encrypt',
+    'decrypt',
+  ]);
+  const spki = new Uint8Array(await crypto.subtle.exportKey('spki', pair.publicKey));
+  const pkcs8 = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey));
+  return { email, publicKey: toB64(spki), ...(await sealPrivate(password, uid, pkcs8)) };
+}
+
+async function openPrivateBytes(password: string, uid: string, rec: UserKeyRecord): Promise<Uint8Array<ArrayBuffer> | null> {
   try {
-    const key = await deriveKey(password, fromB64(meta.salt), meta.iterations);
-    return (await open(key, meta.check, META_AAD)) === META_CHECK ? key : null;
+    const pwKey = await deriveKey(password, fromB64(rec.salt), rec.iterations);
+    return fromB64(await open(pwKey, rec.wrappedPrivate, privAad(uid)));
   } catch {
     return null;
   }
+}
+
+/** Şifre doğruysa özel anahtarı döner, yanlışsa null. */
+export async function openUserPrivateKey(password: string, uid: string, rec: UserKeyRecord): Promise<CryptoKey | null> {
+  const bytes = await openPrivateBytes(password, uid, rec);
+  if (!bytes) return null;
+  return crypto.subtle.importKey('pkcs8', bytes, RSA, false, ['decrypt']);
+}
+
+/** Giriş şifresi değişince: eski şifreyle açıp yeni şifreyle yeniden korur. */
+export async function rewrapUserKeys(
+  oldPassword: string,
+  newPassword: string,
+  uid: string,
+  rec: UserKeyRecord,
+): Promise<UserKeyRecord | null> {
+  const bytes = await openPrivateBytes(oldPassword, uid, rec);
+  if (!bytes) return null;
+  return { ...rec, ...(await sealPrivate(newPassword, uid, bytes)) };
+}
+
+/** Veri anahtarını kullanıcının açık anahtarıyla sarar (RSA-OAEP). */
+export async function wrapDekForUser(dek: CryptoKey, publicKeyB64: string): Promise<string> {
+  const pub = await crypto.subtle.importKey('spki', fromB64(publicKeyB64), RSA, false, ['encrypt']);
+  const wrapped = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, await exportDek(dek));
+  return toB64(new Uint8Array(wrapped));
+}
+
+export async function unwrapDek(privateKey: CryptoKey, wrappedB64: string, extractable: boolean): Promise<CryptoKey> {
+  const raw = new Uint8Array(await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, fromB64(wrappedB64)));
+  return importDek(raw, extractable);
 }
 
 /* ---------- Eski "Tüm Notlar" dışa aktarım dosyası ---------- */

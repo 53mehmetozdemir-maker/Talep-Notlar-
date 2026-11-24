@@ -106,3 +106,19 @@ button.ks-chip:hover{border-color:var(--hi);color:var(--hi);}
   .ks-kv{grid-template-columns:1fr auto;}
   .ks-kv .ks-k{grid-column:1/-1;}
 }
+
+/* Erişim */
+.ks-link{display:block;margin:14px auto 0;background:none;border:none;color:var(--t2);font-family:'Space Grotesk',sans-serif;font-size:12px;text-decoration:underline;cursor:pointer;}
+.ks-link:hover{color:var(--hi);}
+.ks-extra{margin-top:10px;padding:12px 14px;background:var(--c2);border:1px solid var(--bd2);text-align:left;display:flex;flex-direction:column;gap:8px;}
+.ks-extra label{margin:4px 0 0!important;}
+.ks-extras{margin-top:6px;}
+.ks-users{display:flex;flex-direction:column;border:1px solid var(--bd2);margin-top:12px;}
+.ks-user{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--bd2);}
+.ks-user:last-child{border-bottom:none;}
+.ks-user b{font-size:13px;word-break:break-all;}
+.ks-badge{margin-left:10px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--bd2);color:var(--t2);}
+.ks-badge.ok{color:var(--ok);border-color:var(--ok-bd);background:var(--ok-bg);}
+.ks-badge.wait{color:var(--warn);border-color:var(--warn-bd);background:var(--warn-bg);}
+.ks-recovery{margin-top:18px;padding-top:14px;border-top:1px solid var(--bd2);}
+.ks-recovery .ks-btn{margin-top:10px;}

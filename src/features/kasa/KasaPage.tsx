@@ -4,12 +4,15 @@ import { useAuth } from '../../context/auth-context';
 import { appConfirm, appToast } from '../../lib/dialog';
 import { isAdmin } from '../../lib/roles';
 import { Modal } from '../records/Modal';
-import { changeMasterPassword, importNotes, loadMeta, newNoteId, removeNote, saveMeta, saveNote, watchNotes } from './api';
-import type { RawNote } from './api';
-import { createMeta, legacyNeedsPassword, openNote, parseLegacyFile, unlockWithMeta } from './crypto';
-import type { ImportedNote, NotePayload, VaultMeta } from './crypto';
+import { importNotes, loadStatus, newNoteId, removeNote, rotateVault, saveNote, watchAccess, watchNotes, writeKeyRecord } from './api';
+import type { AccessUser, RawNote, VaultStatus } from './api';
+import { AccessDialog } from './AccessDialog';
+import { AccessGate } from './AccessGate';
+import { exportDek, isKeysV2, legacyNeedsPassword, openNote, parseLegacyFile, toB64, wrapDekForUser } from './crypto';
+import type { ImportedNote, NotePayload } from './crypto';
 import {
   downloadText,
+  errMsg,
   fold,
   formatDate,
   highlight,
@@ -29,11 +32,6 @@ interface VaultNote {
 }
 
 type SortMode = 'updated' | 'created' | 'title';
-const MIN_PASSWORD = 12;
-
-function errMsg(e: unknown): string {
-  return e instanceof Error ? e.message : 'bilinmeyen hata';
-}
 
 async function copyText(text: string, okMessage = 'Kopyalandı') {
   try {
@@ -42,106 +40,6 @@ async function copyText(text: string, okMessage = 'Kopyalandı') {
   } catch {
     appToast('Kopyalanamadı (tarayıcı izni yok).', 'error');
   }
-}
-
-function strength(p: string): { label: string; level: number } {
-  let level = 0;
-  if (p.length >= MIN_PASSWORD) level++;
-  if (p.length >= 16) level++;
-  if (/[a-zçğıöşü]/.test(p) && /[A-ZÇĞİÖŞÜ]/.test(p)) level++;
-  if (/\d/.test(p) && /[^A-Za-z0-9ÇĞİÖŞÜçğıöşü]/.test(p)) level++;
-  return { label: ['Zayıf', 'Orta', 'İyi', 'Güçlü', 'Çok güçlü'][level], level };
-}
-
-/* ------------------------------------------------------------------ */
-/* Giriş kapısı: kurulum / kilit açma                                  */
-/* ------------------------------------------------------------------ */
-
-function Gate({ meta, onMeta }: { meta: VaultMeta | null; onMeta: (m: VaultMeta) => void }) {
-  const { role } = useAuth();
-  const admin = isAdmin(role);
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const setup = meta === null;
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setError('');
-    setBusy(true);
-    try {
-      if (setup) {
-        if (pw.length < MIN_PASSWORD) throw new Error(`Şifre en az ${MIN_PASSWORD} karakter olmalı.`);
-        if (pw !== pw2) throw new Error('Şifreler aynı değil.');
-        const created = await createMeta(pw);
-        await saveMeta(created.meta);
-        onMeta(created.meta);
-        setVaultKey(created.key);
-        appToast('KASA kuruldu.', 'success');
-      } else {
-        const key = await unlockWithMeta(pw, meta);
-        if (!key) {
-          await new Promise((r) => setTimeout(r, 1200));
-          throw new Error('Şifre yanlış.');
-        }
-        setVaultKey(key);
-      }
-    } catch (err) {
-      setError(errMsg(err));
-    } finally {
-      setBusy(false);
-      setPw('');
-      setPw2('');
-    }
-  }
-
-  if (setup && !admin) {
-    return (
-      <div className="panel panel-clip ks-gate">
-        <div className="ks-gate-icon">🔒</div>
-        <h3>KASA henüz kurulmamış</h3>
-        <p>İlk kurulumu bir yönetici yapmalı.</p>
-      </div>
-    );
-  }
-
-  const st = strength(pw);
-  return (
-    <form className="panel panel-clip ks-gate" onSubmit={submit}>
-      <div className="ks-gate-icon">🔐</div>
-      <h3>{setup ? 'KASA kurulumu' : 'KASA kilitli'}</h3>
-      <p>
-        {setup
-          ? 'Tüm notlar bu master şifreyle tarayıcıda şifrelenir. Şifre hiçbir yere kaydedilmez ve unutulursa kurtarılamaz.'
-          : 'Notları görmek için master şifreyi girin.'}
-      </p>
-      <label htmlFor="ks-pw">{setup ? 'Yeni master şifre' : 'Master şifre'}</label>
-      <input
-        id="ks-pw"
-        type="password"
-        autoFocus
-        autoComplete={setup ? 'new-password' : 'current-password'}
-        value={pw}
-        onChange={(e) => setPw(e.target.value)}
-      />
-      {setup && (
-        <>
-          <div className={`ks-meter ks-lv${st.level}`}>
-            <span />
-            <b>{pw ? st.label : ''}</b>
-          </div>
-          <label htmlFor="ks-pw2">Şifre (tekrar)</label>
-          <input id="ks-pw2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
-        </>
-      )}
-      {error && <div className="ks-error">{error}</div>}
-      <button type="submit" className="btn-primary" disabled={busy || !pw}>
-        {busy ? 'Bekleyin…' : setup ? 'KASA’yı kur' : 'Kilidi aç'}
-      </button>
-    </form>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -310,7 +208,7 @@ function ImportDialog({
             failed.push(`(not ${r.id.slice(0, 6)}…)`);
           }
         }
-        if (incoming.length === 0) throw new Error('Yedek açılamadı. Yedek, farklı bir master şifreyle alınmış olabilir.');
+        if (incoming.length === 0) throw new Error('Yedek açılamadı. Yedek, anahtar yenilenmeden önce alınmış olabilir.');
       } else {
         const res = await parseLegacyFile(json, legacyPw);
         incoming = res.notes;
@@ -393,71 +291,6 @@ function ImportDialog({
 }
 
 /* ------------------------------------------------------------------ */
-/* Master şifre değiştirme                                             */
-/* ------------------------------------------------------------------ */
-
-function PasswordDialog({
-  notes,
-  onDone,
-  onClose,
-}: {
-  notes: VaultNote[];
-  onDone: (meta: VaultMeta) => void;
-  onClose: () => void;
-}) {
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const st = strength(pw);
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    setError('');
-    if (pw.length < MIN_PASSWORD) return setError(`Şifre en az ${MIN_PASSWORD} karakter olmalı.`);
-    if (pw !== pw2) return setError('Şifreler aynı değil.');
-    setBusy(true);
-    try {
-      const key = await changeMasterPassword(notes, pw);
-      const meta = await loadMeta();
-      if (meta) onDone(meta);
-      setVaultKey(key);
-      appToast('Master şifre değiştirildi. Diğer kullanıcılar yeni şifreyle girmeli.', 'success');
-      onClose();
-    } catch (err) {
-      setError(errMsg(err));
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Modal onClose={onClose} variant="edit">
-      <form className="ks-modal panel panel-clip" onSubmit={submit}>
-        <h3>Master şifreyi değiştir</h3>
-        <p className="ks-hint">Tüm notlar yeni şifreyle yeniden şifrelenir. İşlem sırasında başkası not değiştiriyorsa o değişiklik kaybolabilir.</p>
-        <label htmlFor="ks-npw">Yeni master şifre</label>
-        <input id="ks-npw" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus />
-        <div className={`ks-meter ks-lv${st.level}`}>
-          <span />
-          <b>{pw ? st.label : ''}</b>
-        </div>
-        <label htmlFor="ks-npw2">Yeni şifre (tekrar)</label>
-        <input id="ks-npw2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
-        {error && <div className="ks-error">{error}</div>}
-        <div className="ks-modal-actions">
-          <button type="submit" className="btn-primary" disabled={busy || !pw}>
-            {busy ? 'Yeniden şifreleniyor…' : 'Değiştir'}
-          </button>
-          <button type="button" className="btn-cancel" onClick={onClose}>
-            Vazgeç
-          </button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /* Not ayrıntısı                                                       */
 /* ------------------------------------------------------------------ */
 
@@ -497,7 +330,7 @@ function NoteBody({ note, terms, hidden }: { note: VaultNote; terms: string[]; h
 /* Açık kasa                                                           */
 /* ------------------------------------------------------------------ */
 
-function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultMeta; onMeta: (m: VaultMeta) => void }) {
+function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
   const { role } = useAuth();
   const admin = isAdmin(role);
 
@@ -513,7 +346,9 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<VaultNote | 'new' | null>(null);
   const [showImport, setShowImport] = useState(false);
-  const [showPw, setShowPw] = useState(false);
+  const [showAccess, setShowAccess] = useState(false);
+  const [access, setAccess] = useState<AccessUser[] | null>(null);
+  const [busyUid, setBusyUid] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   // Gerçek zamanlı şifreli veri
@@ -526,6 +361,12 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
       (e) => setLoadError(`Veriler okunamadı: ${e.message}`),
     );
   }, []);
+
+  // Yönetici: kullanıcı/onay durumları
+  useEffect(() => {
+    if (!admin) return;
+    return watchAccess(setAccess, (e) => appToast(`Erişim listesi okunamadı: ${e.message}`, 'error'));
+  }, [admin]);
 
   // Çözme
   useEffect(() => {
@@ -572,6 +413,7 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
   }, []);
 
   const terms = useMemo(() => searchTerms(query), [query]);
+  const pendingCount = (access ?? []).filter((u) => !u.approved).length;
 
   const tagCounts = useMemo(() => {
     const m = new Map<string, number>();
@@ -634,11 +476,52 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
     }
   }
 
+  async function approveUser(u: AccessUser) {
+    setBusyUid(u.uid);
+    try {
+      await writeKeyRecord(u.uid, await wrapDekForUser(cryptoKey, u.publicKey));
+      appToast(`${u.email} onaylandı.`, 'success');
+    } catch (err) {
+      appToast(`Onaylanamadı: ${errMsg(err)}`, 'error');
+    } finally {
+      setBusyUid(null);
+    }
+  }
+
+  async function revokeUser(u: AccessUser) {
+    if (!raw || !access) return;
+    const ok = await appConfirm(
+      `${u.email} kullanıcısının erişimi kaldırılsın mı? Veri anahtarı yenilenecek ve tüm notlar yeniden şifrelenecek. Eski yedek dosyaları açılamaz hale gelir.`,
+    );
+    if (!ok) return;
+    setBusyUid(u.uid);
+    try {
+      const keep = access.filter((x) => x.approved && x.uid !== u.uid);
+      setVaultKey(await rotateVault(cryptoKey, raw, keep, [u.uid]));
+      appToast(`${u.email} erişimi kaldırıldı, notlar yeni anahtarla şifrelendi.`, 'success');
+    } catch (err) {
+      appToast(`Kaldırılamadı: ${errMsg(err)}`, 'error');
+    } finally {
+      setBusyUid(null);
+    }
+  }
+
+  async function downloadRecoveryKey() {
+    const ok = await appConfirm(
+      'Kurtarma dosyası notların anahtarını DÜZ olarak içerir. Eline geçiren herkes notları açabilir. Güvenli bir yerde saklayacak mısın?',
+    );
+    if (!ok) return;
+    const dek = toB64(await exportDek(cryptoKey));
+    const body = { format: 'kasa-recovery', version: 1, createdAt: new Date().toISOString(), dek };
+    downloadText(`kasa-kurtarma-anahtari-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(body), 'application/json');
+    appToast('Kurtarma anahtarı indirildi. Güvenli bir yere kaydet.', 'success');
+  }
+
   function exportBackup() {
     if (!raw) return;
-    const file = { format: 'kasa-backup', version: 1, exportedAt: new Date().toISOString(), meta, notes: raw };
+    const file = { format: 'kasa-backup', version: 2, exportedAt: new Date().toISOString(), notes: raw };
     downloadText(`kasa-yedek-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(file), 'application/json');
-    appToast('Şifreli yedek indirildi (içeriği master şifresiz okunamaz).', 'success');
+    appToast('Şifreli yedek indirildi. Anahtar yenilenirse eski yedekler açılamaz.', 'success');
   }
 
   function onListKey(e: React.KeyboardEvent) {
@@ -696,8 +579,8 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
           Şifreli yedek indir
         </button>
         {admin && (
-          <button type="button" className="ks-btn" onClick={() => setShowPw(true)} disabled={!notes}>
-            Şifre değiştir
+          <button type="button" className="ks-btn" onClick={() => setShowAccess(true)}>
+            Erişim yönetimi{pendingCount > 0 ? ` (${pendingCount} bekleyen)` : ''}
           </button>
         )}
         <button type="button" className="ks-btn ks-btn-lock" onClick={lockVault}>
@@ -873,7 +756,17 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
         />
       )}
       {showImport && <ImportDialog key0={cryptoKey} existing={notes ?? []} onClose={() => setShowImport(false)} />}
-      {showPw && notes && <PasswordDialog notes={notes} onDone={onMeta} onClose={() => setShowPw(false)} />}
+      {showAccess && (
+        <AccessDialog
+          users={access}
+          myUid={uid}
+          busyUid={busyUid}
+          onApprove={(u) => void approveUser(u)}
+          onRevoke={(u) => void revokeUser(u)}
+          onRecoveryKey={() => void downloadRecoveryKey()}
+          onClose={() => setShowAccess(false)}
+        />
+      )}
     </div>
   );
 }
@@ -881,19 +774,30 @@ function Vault({ cryptoKey, meta, onMeta }: { cryptoKey: CryptoKey; meta: VaultM
 /* ------------------------------------------------------------------ */
 
 export function KasaPage() {
+  const { user, role } = useAuth();
   const key = useVaultKey();
-  const [meta, setMeta] = useState<VaultMeta | null | undefined>(undefined);
+  const [status, setStatus] = useState<VaultStatus | undefined>(undefined);
   const [error, setError] = useState('');
+  const uid = user?.uid ?? '';
+
+  const refresh = useCallback(async () => {
+    try {
+      setStatus(await loadStatus(uid));
+      setError('');
+    } catch (e) {
+      setError(`KASA bilgisi okunamadı: ${errMsg(e)}`);
+    }
+  }, [uid]);
 
   useEffect(() => {
     let active = true;
-    loadMeta()
-      .then((m) => active && setMeta(m))
+    loadStatus(uid)
+      .then((s) => active && setStatus(s))
       .catch((e: unknown) => active && setError(`KASA bilgisi okunamadı: ${errMsg(e)}`));
     return () => {
       active = false;
     };
-  }, []);
+  }, [uid]);
 
   let body: ReactNode;
   if (error) {
@@ -902,19 +806,19 @@ export function KasaPage() {
         <div className="ks-gate-icon">⚠️</div>
         <h3>KASA açılamadı</h3>
         <p>{error}</p>
-        <p className="ks-hint">Firestore kurallarında “kasa” ve “kasaMeta” için erişim izni tanımlı olmayabilir.</p>
+        <p className="ks-hint">Firestore kurallarında KASA için erişim izni tanımlı olmayabilir.</p>
       </div>
     );
-  } else if (meta === undefined) {
+  } else if (!status) {
     body = (
       <div className="empty">
         <div className="empty-text">Yükleniyor…</div>
       </div>
     );
-  } else if (key && meta) {
-    body = <Vault cryptoKey={key} meta={meta} onMeta={setMeta} />;
+  } else if (key && status.meta && isKeysV2(status.meta)) {
+    body = <Vault cryptoKey={key} uid={uid} />;
   } else {
-    body = <Gate meta={meta} onMeta={setMeta} />;
+    body = <AccessGate status={status} uid={uid} email={user?.email ?? ''} admin={isAdmin(role)} onRefresh={refresh} />;
   }
 
   return (

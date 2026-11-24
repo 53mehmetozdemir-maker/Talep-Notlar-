@@ -119,3 +119,9 @@ export function downloadText(filename: string, text: string, mime = 'text/plain'
 export function safeFileName(title: string): string {
   return title.replace(/[\\/:*?"<>|]+/g, '_').trim().slice(0, 80) || 'not';
 }
+
+export function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : 'bilinmeyen hata';
+}
+
+export const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
