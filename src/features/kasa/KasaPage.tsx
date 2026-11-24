@@ -49,11 +49,13 @@ async function copyText(text: string, okMessage = 'Kopyalandı') {
 function NoteEditor({
   note,
   allTags,
+  allowPin,
   onClose,
   onSave,
 }: {
   note: VaultNote | null;
   allTags: string[];
+  allowPin: boolean;
   onClose: () => void;
   onSave: (id: string | null, payload: NotePayload) => Promise<void>;
 }) {
@@ -138,10 +140,12 @@ function NoteEditor({
         <label htmlFor="ks-content">İçerik</label>
         <textarea id="ks-content" className="ks-textarea" rows={14} spellCheck={false} value={content} onChange={(e) => setContent(e.target.value)} />
 
-        <label className="ks-check">
-          <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
-          Sabitle (listenin başında görünsün)
-        </label>
+        {allowPin && (
+          <label className="ks-check">
+            <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
+            Sabitle (listenin başında görünsün)
+          </label>
+        )}
 
         <div className="ks-modal-actions">
           <button type="submit" className="btn-primary" disabled={busy}>
@@ -713,12 +717,16 @@ function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
                     {selHidden ? 'Göster' : 'Gizle'}
                   </button>
                 )}
-                <button type="button" className="ks-btn" onClick={() => void togglePin(sel)}>
-                  {sel.payload.pinned ? '★ Sabitlemeyi kaldır' : '☆ Sabitle'}
-                </button>
-                <button type="button" className="ks-btn" onClick={() => setEditing(sel)}>
-                  Düzenle
-                </button>
+                {admin && (
+                  <button type="button" className="ks-btn" onClick={() => void togglePin(sel)}>
+                    {sel.payload.pinned ? '★ Sabitlemeyi kaldır' : '☆ Sabitle'}
+                  </button>
+                )}
+                {admin && (
+                  <button type="button" className="ks-btn" onClick={() => setEditing(sel)}>
+                    Düzenle
+                  </button>
+                )}
                 <button
                   type="button"
                   className="ks-btn"
@@ -731,9 +739,11 @@ function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
                 >
                   İndir
                 </button>
-                <button type="button" className="ks-btn ks-btn-del" onClick={() => void handleDelete(sel)}>
-                  Sil
-                </button>
+                {admin && (
+                  <button type="button" className="ks-btn ks-btn-del" onClick={() => void handleDelete(sel)}>
+                    Sil
+                  </button>
+                )}
               </div>
               {selHidden && <div className="ks-hint ks-hide-note">Bu not hassas görünüyor, bulanık gösteriliyor. “Göster” ile açın.</div>}
               <NoteBody note={sel} terms={terms} hidden={selHidden} />
@@ -751,6 +761,7 @@ function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
           key={editing === 'new' ? 'new' : editing.id}
           note={editing === 'new' ? null : editing}
           allTags={allTagNames}
+          allowPin={admin}
           onClose={() => setEditing(null)}
           onSave={handleSave}
         />
