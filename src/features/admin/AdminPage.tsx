@@ -1,9 +1,10 @@
-import { appAlert, appConfirm } from '../../lib/dialog';
+import { appAlert, appConfirm, appToast } from '../../lib/dialog';
 import { useState } from 'react';
 import { deleteApp, initializeApp } from 'firebase/app';
 import { createUserWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
 import { addDoc, collection, deleteDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../lib/firebase';
 import { useAuth } from '../../context/auth-context';
 import { useCollection } from '../../hooks/useCollection';
 import { localDate } from '../../lib/localdate';
@@ -108,6 +109,12 @@ export function AdminPage() {
   const [uMsg, setUMsg] = useState<Notice | null>(null);
   const [uBusy, setUBusy] = useState(false);
 
+  const [pwUser, setPwUser] = useState<UserDoc | null>(null);
+  const [pwValue, setPwValue] = useState('');
+  const [pwShow, setPwShow] = useState(false);
+  const [pwBusy, setPwBusy] = useState(false);
+  const [pwErr, setPwErr] = useState('');
+
   const sortedAssigns = [...assigns].sort((a, b) => a.date.localeCompare(b.date));
 
   async function addAssign() {
@@ -157,6 +164,37 @@ export function AdminPage() {
       await updateDoc(doc(db, 'users', u.id), { role: r });
     } catch (e) {
       appAlert('Yetki güncellenemedi: ' + (e as Error).message);
+    }
+  }
+
+  function openPw(u: UserDoc) {
+    setPwUser(u);
+    setPwValue('');
+    setPwShow(false);
+    setPwErr('');
+  }
+
+  async function savePw() {
+    if (!pwUser) return;
+    if (pwValue.length < 8) return setPwErr('Şifre en az 8 karakter olmalı.');
+    setPwBusy(true);
+    setPwErr('');
+    try {
+      const call = httpsCallable<{ uid: string; password: string }, { ok: boolean }>(functions, 'setUserPassword');
+      await call({ uid: pwUser.id, password: pwValue });
+      appToast(`${pwUser.email} için şifre değiştirildi. Kullanıcıya iletin.`, 'success');
+      setPwUser(null);
+      setPwValue('');
+    } catch (err) {
+      const code = (err as { code?: string }).code || '';
+      const msg = (err as Error).message || '';
+      if (code === 'functions/unavailable' || code === 'functions/internal' || msg === 'NOT_FOUND') {
+        setPwErr('Sunucuya ulaşılamadı. Şifre fonksiyonu Firebase\'e yayınlanmamış olabilir ya da bağlantı sorunu var.');
+      } else {
+        setPwErr(msg || 'Şifre değiştirilemedi.');
+      }
+    } finally {
+      setPwBusy(false);
     }
   }
 
@@ -293,9 +331,14 @@ export function AdminPage() {
                         {self ? (
                           <span className="x-note">kendi hesabınız</span>
                         ) : (
-                          <button className="x-del" type="button" onClick={() => removeUser(u)}>
-                            🗑 Sil
-                          </button>
+                          <>
+                            <button className="x-del" type="button" onClick={() => openPw(u)} style={{ marginRight: 8 }}>
+                              🔑 Şifre
+                            </button>
+                            <button className="x-del" type="button" onClick={() => removeUser(u)}>
+                              🗑 Sil
+                            </button>
+                          </>
                         )}
                       </td>
                     </tr>
@@ -305,10 +348,43 @@ export function AdminPage() {
             </table>
           </div>
           <div className="x-note">
+            Şifre değiştirince kullanıcının açık oturumları kapanır. Kullanıcı KASA'yı yeni şifreyle açamazsa KASA ekranında "Giriş şifremi değiştirdim" (eski şifreyi biliyorsa) ya da "Anahtarımı sıfırla" seçeneğini kullanır.
+          </div>
+          <div className="x-note">
             Not: Kullanıcı silmek yalnızca yetki kaydını kaldırır; giriş hesabı Firebase Authentication'da durur.
           </div>
         </div>
       </div>
+
+      {pwUser && (
+        <div className="dlg-overlay" onClick={() => !pwBusy && setPwUser(null)}>
+          <div className="dlg-box" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h4>Şifre Belirle</h4>
+            <p>{pwUser.email} kullanıcısı için yeni giriş şifresi yazın (en az 8 karakter).</p>
+            <input
+              type={pwShow ? 'text' : 'password'}
+              autoComplete="new-password"
+              autoFocus
+              value={pwValue}
+              onChange={(e) => setPwValue(e.target.value)}
+              placeholder="Yeni şifre"
+              style={{ width: '100%', marginBottom: 8 }}
+            />
+            <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 13, marginBottom: 12 }}>
+              <input type="checkbox" checked={pwShow} onChange={(e) => setPwShow(e.target.checked)} /> Şifreyi göster
+            </label>
+            {pwErr && <div className="x-err" style={{ marginBottom: 12 }}>{pwErr}</div>}
+            <div className="dlg-actions">
+              <button type="button" className="dlg-btn dlg-cancel" disabled={pwBusy} onClick={() => setPwUser(null)}>
+                Vazgeç
+              </button>
+              <button type="button" className="dlg-btn dlg-danger" disabled={pwBusy} onClick={savePw}>
+                {pwBusy ? 'Kaydediliyor…' : 'Şifreyi Değiştir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
