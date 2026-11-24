@@ -145,6 +145,7 @@ export function AccessGate({ status, uid, email, admin, onRefresh }: Props) {
       if (
         !(await appConfirm(
           'Anahtarın sıfırlansın mı? KASA erişimin kapanır, yöneticinin seni yeniden onaylaması gerekir. Notlar silinmez.',
+          'Sıfırla',
         ))
       )
         return;

@@ -1,7 +1,7 @@
 export type ToastKind = 'success' | 'error' | 'info';
 
 interface Handlers {
-  confirm: (message: string) => Promise<boolean>;
+  confirm: (message: string, confirmLabel?: string) => Promise<boolean>;
   toast: (message: string, kind?: ToastKind) => void;
 }
 
@@ -12,8 +12,8 @@ export function registerDialog(h: Handlers | null) {
 }
 
 /** Onay penceresi. Arayüz hazır değilse güvenli tarafta kalıp false döner. */
-export function appConfirm(message: string): Promise<boolean> {
-  return handlers ? handlers.confirm(message) : Promise.resolve(false);
+export function appConfirm(message: string, confirmLabel?: string): Promise<boolean> {
+  return handlers ? handlers.confirm(message, confirmLabel) : Promise.resolve(false);
 }
 
 export function appToast(message: string, kind: ToastKind = 'info'): void {

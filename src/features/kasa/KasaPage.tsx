@@ -496,6 +496,7 @@ function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
     if (!raw || !access) return;
     const ok = await appConfirm(
       `${u.email} kullanıcısının erişimi kaldırılsın mı? Veri anahtarı yenilenecek ve tüm notlar yeniden şifrelenecek. Eski yedek dosyaları açılamaz hale gelir.`,
+      'Erişimi kaldır',
     );
     if (!ok) return;
     setBusyUid(u.uid);
@@ -513,6 +514,7 @@ function Vault({ cryptoKey, uid }: { cryptoKey: CryptoKey; uid: string }) {
   async function downloadRecoveryKey() {
     const ok = await appConfirm(
       'Kurtarma dosyası notların anahtarını DÜZ olarak içerir. Eline geçiren herkes notları açabilir. Güvenli bir yerde saklayacak mısın?',
+      'İndir',
     );
     if (!ok) return;
     const dek = toB64(await exportDek(cryptoKey));

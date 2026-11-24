@@ -12,6 +12,7 @@ interface ToastItem {
 
 function DialogHost() {
   const [message, setMessage] = useState<string | null>(null);
+  const [label, setLabel] = useState('Sil');
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const resolver = useRef<((value: boolean) => void) | null>(null);
   const nextId = useRef(1);
@@ -24,10 +25,11 @@ function DialogHost() {
 
   useEffect(() => {
     registerDialog({
-      confirm: (m) =>
+      confirm: (m, confirmLabel) =>
         new Promise<boolean>((resolve) => {
           resolver.current?.(false);
           resolver.current = resolve;
+          setLabel(confirmLabel ?? 'Sil');
           setMessage(m);
         }),
       toast: (m, kind = 'info') => {
@@ -66,7 +68,7 @@ function DialogHost() {
                 Vazgeç
               </button>
               <button type="button" className="dlg-btn dlg-danger" onClick={() => answer(true)}>
-                Sil
+                {label}
               </button>
             </div>
           </div>
