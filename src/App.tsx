@@ -11,6 +11,7 @@ import { ResolvedPage } from './features/resolved/ResolvedPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { CalendarPage } from './features/calendar/CalendarPage';
 import { AdminPage } from './features/admin/AdminPage';
+import { KasaPage } from './features/kasa/KasaPage';
 
 function Shell() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="cozulenler" element={<ResolvedPage />} />
         <Route element={<RequireRole allow={canCreate} />}>
           <Route path="yeni" element={<NewRecordPage />} />
+          <Route path="kasa" element={<KasaPage />} />
         </Route>
         <Route element={<RequireRole allow={isAdmin} />}>
           <Route path="yonetim" element={<AdminPage />} />

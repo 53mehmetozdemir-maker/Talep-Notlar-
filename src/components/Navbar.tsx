@@ -18,6 +18,7 @@ const ITEMS: Item[] = [
   { to: '/talepler', label: 'Talepler', visible: () => true },
   { to: '/cozulenler', label: 'Çözülen Talepler', visible: () => true },
   { to: '/yeni', label: 'Yeni Talep', visible: canCreate },
+  { to: '/kasa', label: 'KASA', visible: canCreate },
   { to: '/yonetim', label: 'Yönetim', visible: isAdmin },
 ];
 
