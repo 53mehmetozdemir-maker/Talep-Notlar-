@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
 import { FirebaseError } from 'firebase/app';
-import { auth } from '../lib/firebase';
+import { auth, functions } from '../lib/firebase';
 import { ThemeButton } from './ThemeButton';
 
 function errorMessage(err: unknown): string {
@@ -39,24 +40,18 @@ export function LoginScreen() {
     }
     setBusy(true);
     try {
-      await sendPasswordResetEmail(auth, mail);
+      await httpsCallable<{ email: string }, { ok: boolean }>(functions, 'sendPasswordReset')({ email: mail });
       setInfo(
         'Bu adres sistemde kayıtlıysa şifre yenileme bağlantısı gönderildi. Gelen kutunuzu ve gereksiz (spam) klasörünü kontrol edin.',
       );
     } catch (err) {
-      if (err instanceof FirebaseError && err.code === 'auth/user-not-found') {
-        // Hesabın var olup olmadığını belli etmemek için aynı mesajı göster.
-        setInfo(
-          'Bu adres sistemde kayıtlıysa şifre yenileme bağlantısı gönderildi. Gelen kutunuzu ve gereksiz (spam) klasörünü kontrol edin.',
-        );
-      } else if (err instanceof FirebaseError && err.code === 'auth/invalid-email') {
+      const code = (err as { code?: string }).code || '';
+      if (code === 'functions/invalid-argument') {
         setError('E-posta adresi geçersiz görünüyor.');
-      } else if (err instanceof FirebaseError && err.code === 'auth/too-many-requests') {
+      } else if (code === 'functions/resource-exhausted') {
         setError('Çok fazla deneme yapıldı. Biraz bekleyip tekrar deneyin.');
-      } else if (err instanceof FirebaseError && err.code === 'auth/network-request-failed') {
-        setError('Bağlantı hatası. İnternetinizi kontrol edin.');
       } else {
-        setError('Şifre yenileme e-postası gönderilemedi. Lütfen tekrar deneyin.');
+        setError('Şifre yenileme e-postası gönderilemedi. Lütfen biraz sonra tekrar deneyin.');
       }
     } finally {
       setBusy(false);

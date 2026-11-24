@@ -1,4 +1,5 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { ResetPasswordPage } from './components/ResetPasswordPage';
 import './features/pages.css';
 import { useAuth } from './context/auth-context';
 import { canCreate, isAdmin } from './lib/roles';
@@ -26,7 +27,9 @@ function Shell() {
 
 export default function App() {
   const { user, loading } = useAuth();
+  const { pathname } = useLocation();
 
+  if (pathname === '/sifre-yenile') return <ResetPasswordPage />;
   if (loading) return null;
   if (!user) return <LoginScreen />;
 
