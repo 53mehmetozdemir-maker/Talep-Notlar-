@@ -44,7 +44,7 @@ function resetMailHtml(link) {
 <tr><td align="center" style="padding:32px 16px;">
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0a14" style="width:100%;max-width:480px;background:#0a0a14;border:1px solid #272f11;">
 <tr><td align="center" style="padding:44px 36px 8px 36px;">
-<img src="${SITE_URL}mail-logo.png" width="52" height="52" alt="T" style="display:block;margin:0 auto;border:0;outline:none;width:52px;height:52px;font-family:${mono};font-size:22px;font-weight:700;color:#c8ff00;line-height:52px;text-align:center;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="52" height="52" align="center" valign="middle" bgcolor="#c8ff00" style="width:52px;height:52px;background:#c8ff00;"><img src="${SITE_URL}mail-logo2.png" width="52" height="52" alt="T" style="display:block;border:0;outline:none;width:52px;height:52px;font-family:${mono};font-size:22px;font-weight:700;color:#04040a;line-height:52px;text-align:center;"></td></tr></table>
 <h1 style="margin:20px 0 6px 0;font-family:${font};font-size:34px;line-height:1.05;font-weight:700;letter-spacing:-1.5px;color:#f0f0ff;">ŞİFRE<br>YENİLE</h1>
 <div style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#5a5a8a;">TALEP NOTLARI // KURUMSAL TALEP YÖNETİMİ</div>
 </td></tr>
