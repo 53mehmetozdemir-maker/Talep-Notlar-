@@ -34,14 +34,40 @@ async function hit(key, max, windowMs) {
 }
 
 function resetMailHtml(link) {
-  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#222;line-height:1.5">
-<p>Merhaba,</p>
-<p>Talep Notları hesabınızın şifresini yenilemek için aşağıdaki düğmeye tıklayın.</p>
-<p><a href="${link}" style="display:inline-block;background:#1a73e8;color:#fff;text-decoration:none;padding:10px 18px;border-radius:6px">Şifremi yenile</a></p>
-<p>Düğme çalışmazsa bu bağlantıyı tarayıcınıza yapıştırın:<br><a href="${link}">${link}</a></p>
-<p>Bu isteği siz yapmadıysanız bu e-postayı dikkate almayın, şifreniz değişmez.</p>
-<p>Teşekkürler,<br>Talep Notları ekibi</p>
-</div>`;
+  const font = "'Space Grotesk',Arial,Helvetica,sans-serif";
+  const mono = "'Space Mono','Courier New',monospace";
+  return `<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"><title>Şifre Yenile</title></head>
+<body style="margin:0;padding:0;background:#04040a;" bgcolor="#04040a">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#04040a;">Talep Notları şifrenizi yenilemek için bağlantıya tıklayın.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#04040a" style="background:#04040a;">
+<tr><td align="center" style="padding:32px 16px;">
+<table role="presentation" width="480" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0a14" style="width:100%;max-width:480px;background:#0a0a14;border:1px solid #272f11;">
+<tr><td align="center" style="padding:44px 36px 8px 36px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="52" height="52" align="center" valign="middle" bgcolor="#c8ff00" style="width:52px;height:52px;background:#c8ff00;font-family:${mono};font-size:22px;font-weight:700;color:#04040a;">T</td></tr></table>
+<h1 style="margin:20px 0 6px 0;font-family:${font};font-size:34px;line-height:1.05;font-weight:700;letter-spacing:-1.5px;color:#f0f0ff;">ŞİFRE<br>YENİLE</h1>
+<div style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#5a5a8a;">TALEP NOTLARI // KURUMSAL TALEP YÖNETİMİ</div>
+</td></tr>
+<tr><td align="left" style="padding:28px 36px 8px 36px;font-family:${font};font-size:15px;line-height:1.6;color:#f0f0ff;">
+<p style="margin:0 0 14px 0;">Merhaba,</p>
+<p style="margin:0 0 4px 0;color:#9898c8;">Hesabınızın şifresini yenilemek için aşağıdaki düğmeye tıklayın.</p>
+</td></tr>
+<tr><td align="center" style="padding:20px 36px 12px 36px;">
+<a href="${link}" style="display:block;background:#c8ff00;color:#04040a;font-family:${font};font-size:13px;font-weight:700;letter-spacing:1px;text-decoration:none;padding:15px 22px;text-align:center;">ŞİFREMİ YENİLE &rarr;</a>
+</td></tr>
+<tr><td align="left" style="padding:12px 36px 8px 36px;font-family:${mono};font-size:11px;line-height:1.6;color:#5a5a8a;">
+Düğme çalışmazsa bu bağlantıyı tarayıcınıza yapıştırın:<br>
+<a href="${link}" style="color:#9898c8;word-break:break-all;">${link}</a>
+</td></tr>
+<tr><td align="left" style="padding:20px 36px 36px 36px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid #1a1a30;padding-top:18px;font-family:${font};font-size:13px;line-height:1.6;color:#9898c8;">
+Bu isteği siz yapmadıysanız bu e-postayı dikkate almayın, şifreniz değişmez.<br>
+<span style="color:#5a5a8a;">Talep Notları ekibi</span>
+</td></tr></table>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
 }
 
 /**
