@@ -6,6 +6,7 @@ const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
 const { defineSecret } = require('firebase-functions/params');
 const crypto = require('crypto');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
 initializeApp();
@@ -44,7 +45,7 @@ function resetMailHtml(link) {
 <tr><td align="center" style="padding:32px 16px;">
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0a14" style="width:100%;max-width:480px;background:#0a0a14;border:1px solid #272f11;">
 <tr><td align="center" style="padding:44px 36px 8px 36px;">
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="52" height="52" align="center" valign="middle" bgcolor="#c8ff00" style="width:52px;height:52px;background:#c8ff00;"><img src="${SITE_URL}mail-logo2.png" width="52" height="52" alt="T" style="display:block;border:0;outline:none;width:52px;height:52px;font-family:${mono};font-size:22px;font-weight:700;color:#04040a;line-height:52px;text-align:center;"></td></tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td width="52" height="52" align="center" valign="middle" bgcolor="#c8ff00" style="width:52px;height:52px;background:#c8ff00;"><img src="cid:tn-logo" width="52" height="52" alt="T" style="display:block;border:0;outline:none;width:52px;height:52px;font-family:${mono};font-size:22px;font-weight:700;color:#04040a;line-height:52px;text-align:center;"></td></tr></table>
 <h1 style="margin:20px 0 6px 0;font-family:${font};font-size:34px;line-height:1.05;font-weight:700;letter-spacing:-1.5px;color:#f0f0ff;">ŞİFRE<br>YENİLE</h1>
 <div style="font-family:${mono};font-size:10px;letter-spacing:2px;color:#5a5a8a;">TALEP NOTLARI // KURUMSAL TALEP YÖNETİMİ</div>
 </td></tr>
@@ -117,6 +118,9 @@ exports.sendPasswordReset = onCall(
         subject: 'Talep Notları şifrenizi yenileyin',
         text: `Merhaba,\n\nTalep Notları hesabınızın şifresini yenilemek için bu bağlantıya tıklayın:\n${link}\n\nBu isteği siz yapmadıysanız bu e-postayı dikkate almayın, şifreniz değişmez.\n\nTeşekkürler,\nTalep Notları ekibi`,
         html: resetMailHtml(link),
+        attachments: [
+          { filename: 'logo.png', path: path.join(__dirname, 'mail-logo.png'), cid: 'tn-logo', contentDisposition: 'inline' },
+        ],
       });
     } catch (err) {
       console.error('sendPasswordReset mail hata', err && (err.code || err.responseCode));
